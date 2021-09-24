@@ -1,0 +1,8 @@
+.content-area {
+    height: calc(100vh - 55px);
+    background-color: #fff;
+    position: relative;
+    padding: 8px;
+    overflow: hidden;
+    width: 100%;
+}

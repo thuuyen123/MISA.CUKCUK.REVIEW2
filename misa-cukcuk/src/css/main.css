@@ -1,0 +1,71 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-transform: none;
+    text-decoration: none;
+    -webkit-text-decoration-line: none;
+    text-decoration-line: none;
+    text-decoration-thickness: initial;
+    -webkit-text-decoration-style: initial;
+    text-decoration-style: solid;
+    -webkit-text-decoration-color: initial;
+    text-decoration-color: initial;
+
+}
+
+body {
+    font-family: Tahoma-Regular;
+    font-size: 13px;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+a{
+    color: #000;
+}
+@font-face {
+    font-family: Tahoma-Regular;
+    src: url("../assets/fonts/Tahoma_Regular.woff");
+}
+@font-face {
+    font-family: Tahoma-Bold;
+    src: url("../assets/fonts/Tahoma_Bold.woff");
+}
+
+.text-overflow-ellipsis{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.text-align-center{
+    text-align: center;
+}
+.text-align-right{
+    text-align: right;
+}
+.input-border-red {
+    border-color: red !important;
+}
+.input-border-normal{
+    border-color: #bbbbbb !important    ;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b8bcc3;
+    border-radius: 1px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #7e7e7e;
+}
+@import "../css/common/common.css";
+@import "../css/common/icon.css";

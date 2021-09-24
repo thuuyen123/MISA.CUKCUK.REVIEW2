@@ -1,0 +1,91 @@
+.header{
+    display: flex;
+    height: 55px;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    background-color: #0072bc;
+    width: 100vw;
+}
+
+.header-logo {
+    height: 55px;
+    width: 230px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 12px;
+}
+
+.header-app-name{
+    background-image: url('../../assets/images/misa.png');
+    background-repeat: no-repeat;
+    height: 20px;
+    width: 180px;
+    margin-left: 6px;
+}
+
+.header-info {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    flex-basis: calc(100% - 230px);
+}
+.header .header-info-account{
+    display: flex;
+    align-items: center;
+    padding-right: 20px;
+    white-space: nowrap;
+}
+
+.header-info-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-text{
+    color: #fff;
+}
+/* @media (max-width: 1300px) {
+    .header-branch-name {
+        max-width: 160px;
+    }
+}
+
+@media (max-width: 1366px) {
+    .header-branch-name {
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 1440px) {
+    .header-branch-name {
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 1680px) {
+    .header-branch-name {
+        max-width: 450px;
+    }
+} */
+
+
+
+
+.header-info-account .info-avatar{
+    margin: 0px 6px 0px 16px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+.header-info-account .account-name{
+    font-size: 13px;
+    color: #fff;
+    cursor: pointer;
+    margin-right: 10px;
+    height: 55px;
+    line-height: 55px;
+}
+

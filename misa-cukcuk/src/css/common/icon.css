@@ -1,0 +1,203 @@
+.sprite {
+    background-image: url(../../assets/images/IconSprite.png);
+    cursor: pointer;
+    background-color: transparent;
+    margin: 0 auto;
+    background-repeat: no-repeat;
+}
+
+.icon-toggle {
+    background: url(../../assets/images/icon-toggle.png) no-repeat;
+    width: 24px;
+    height: 24px;
+    background-position: 2px 2px !important;
+}
+
+.icon-phone-support {
+    background: url(../../assets//images/support.png) no-repeat;
+    width: 55px;
+    height: 55px;
+}
+
+.icon-announce {
+    background: url(../../assets//images/annouce.png) no-repeat;
+    width: 40px;
+    height: 55px;
+}
+
+.icon-avatar {
+    width: 28px;
+    height: 28px;
+    background: url(../../assets/images/avatar-person.png) no-repeat;
+    cursor: pointer;
+    background-color: #fff;
+    background-position: 2px;
+}
+
+.icon-default-small-arrow {
+    width: 16px;
+    height: 16px;
+    background: url(../../assets/images/default-small-arrow.png) no-repeat;
+    cursor: pointer;
+}
+
+.icon-material {
+    width: 24px;
+    height: 24px;
+    background-position: 0 1px;
+    background-image: url(../../assets/images/vector-smart-object.png);
+    background-repeat: no-repeat;
+    margin-left: 11px;
+}
+
+.icon-btnAddition {
+    background-position: 0px -2648px !important;
+    width: 14px;
+    height: 16px;
+}
+
+.icon-btnDuplicate {
+    background-position: 0 -2096px !important;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btnDelete {
+    width: 16px;
+    height: 16px;
+    background-position: 0-2680px !important;
+}
+
+.icon-refresh {
+    width: 16px!important;
+    height: 16px!important;
+    background-position: 0 -2584px!important;
+}
+
+.icon-form-add-trigger {
+    background-position: 0 -2480px !important;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btnCancel-red {
+    background-position: 0 -1952px !important;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btnHelp {
+    width: 16px!important;
+    height: 16px!important;
+    background-position: 0 -1600px!important;
+}
+
+.icon-form-invalid {
+    background-position: 0 -1808px !important;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btnSaveAdd {
+    background: url(../../assets/images/SaveAdd16.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btnSave {
+    background: url(../../assets/images/Save16.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btnEdit {
+    background: url(../../assets/images/edit16.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-warning {
+    background: url(../../assets/images/icon-warning.png) no-repeat;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-question {
+    background: url(../../assets/images/icon-question.png) no-repeat;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-page-first {
+    background: url(../../assets/images/page-first.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-page-last {
+    background: url(../../assets/images/page-last.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-page-prev {
+    background: url(../../assets/images/page-prev.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-page-first {
+    background: url(../../assets/images/page-first.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-page-next {
+    background: url(../../assets/images/page-next.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.tool-sprites {
+    background: url('../../assets/images/tool-sprites.png') no-repeat;
+    background-color: transparent;
+}
+
+.x-tool-close {
+    background-position: 0px 0px !important;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-tool-zoom {
+    background-position: 0 32px !important;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-table-circle-blue {
+    background: url(../../assets/images/table-circle-blue16.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-feedback{
+    background: url(../../assets/images/viewEmail.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btnLoadPaging{
+    background: url(../../assets/images/refresh.png) no-repeat;
+    width: 16px;
+    height: 16px;
+    margin: 0 !important;
+
+}
+
+.x-form-trigger-default{
+    background: #fff url(../../assets/images/trigger.png) no-repeat;
+    background-position: 0 center;
+    width: 22px;
+    height: 21px;
+}
