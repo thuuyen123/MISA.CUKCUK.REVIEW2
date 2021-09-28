@@ -23,6 +23,7 @@
     background-color: #ededed;
     padding: 0px 3px 3px 3px;
 }
+
 /* 
 .content-table .colunm-header-title:last-child {
     border-right: none !important;
@@ -88,22 +89,26 @@
 
 .form-input-item {
     border: 1px solid #ccc !important;
-    height: 23px;
+    height: 24px;
     min-height: 22px;
-    border-left: none !important;
     width: 100%;
-    padding: 5px;
     padding: 3px 5px 3px!important;
     background-color: #fff;
     color: #000;
 }
 
+.form-input-item:focus {
+    border-color: #0072bc !important;
+}
+
 .button-choice-operator .m-btn {
-    width: 23px;
-    height: 23px;
+    width: 24px;
+    height: 24px;
     background-color: #f5f5f5;
     border: 1px solid #ccc;
+    border-radius: 0px;
     text-align: center;
+    padding-top: 8px;
 }
 
 .content-filter-input {
@@ -128,7 +133,7 @@
 }
 
 .content-table tr:nth-child(even) td {
-    background-color: #f5f5f5 !important;
+    background-color: #f5f5f5;
 }
 
 .content-table tr td {
@@ -139,4 +144,65 @@ input.dropdown-value {
     display: flex;
     width: 100%;
     height: 23px;
+}
+
+.content-filter {
+    position: relative;
+}
+
+.content-filter .content-menu-filter {
+    position: absolute;
+    /* right: -17px; */
+    left: 5px;
+    /* pading: 0px 10px 0px 26px; */
+}
+
+li.context-menu-item {
+    height: 22px;
+    font-size: 13px;
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    text-decoration: none !important;
+    padding: 0px 10px 0px 26px;
+}
+
+ul.context-menu-list {
+    text-decoration: none !important;
+    list-style: none;
+    background-color: #fff;
+    box-shadow: 0px 0px 2px 2px #ccc;
+}
+
+li.context-menu-item.active-menu {
+    background: url(../../assets/images/table-circle-blue16.png) no-repeat left center;
+    background-position: 5px center;
+}
+
+li.context-menu-item {
+    height: 22px;
+    font-size: 13px;
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    text-decoration: none !important;
+    padding: 0px 10px 0px 26px;
+    display: flex;
+    align-items: center;
+}
+
+li.context-menu-item:hover {
+    background-color: #d7e9f4;
+}
+
+.x-item-disable {
+    cursor: default;
+}
+
+.x-record-item:hover td {
+    background-color: #c1ddf1 !important;
+}
+
+.x-record-item-selected {
+    background-color: #c1ddf1 !important;
 }

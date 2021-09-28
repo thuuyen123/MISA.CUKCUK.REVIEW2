@@ -24,14 +24,26 @@
         @keydown.enter="onItemSelect(currentFocus)"
       />
 
-      <div class="combobox-open" @click="toggleItems" v-if="type=='cbxHead'">
-        <div class="cbx-icon icon-default-small-arrow"></div>
-      </div>
-       <div class="combobox-open" @click="toggleItems" v-else>
-        <div class="cbx-icon x-form-trigger-default"></div>
+      <div class="form-control">
+        <div
+          class="combobox-open"
+          @click="toggleItems"
+          v-if="type == 'cbxHead'"
+        >
+          <div class="cbx-icon icon-default-small-arrow"></div>
+        </div>
+        <div class="combobox-open" @click="toggleItems" v-else>
+          <div class="cbx-icon x-form-trigger-default"></div>
+        </div>
+        <div class="cbx-add" v-if="type == 'cbxform'" @click="btnShowFormAdd">
+          <div class="cbx-icon sprite icon-form-add-trigger"></div>
+        </div>
       </div>
     </div>
-    <ul :class="['combobox-list', opened ? 'isshow' : 'isnone']">
+    <ul
+      :class="['combobox-list', opened ? 'isshow' : 'isnone']"
+      :style="styleList"
+    >
       <li
         v-for="(item, index) in itemList"
         :key="index"
@@ -75,6 +87,7 @@ export default {
       default: "",
     },
     fieldType: String,
+    styleList: String,
   },
   created() {
     this.initChoice();
@@ -118,8 +131,11 @@ export default {
     },
   },
   methods: {
+    btnShowFormAdd() {
+      this.$emit("btnShowFormAdd", this.fieldType);
+    },
     /**
-     * Đóng dropdown khi click ra ngoài
+     * Đóng combobox khi click ra ngoài
      * CreateBy: TTUyen (30/8/2021)
      */
     away: function () {
@@ -159,7 +175,11 @@ export default {
         let me = this;
         this.focusing = true;
         me.loadDataCombobox();
-        if (me.fieldType != "language" && me.fieldType != "branch") {
+        if (
+          me.fieldType != "language" &&
+          me.fieldType != "branch" &&
+          me.fieldType != "pageSize"
+        ) {
           if ((me.selectedId + "").length > 0) {
             me.dataCombobox.forEach((item) => {
               if (me.selectedId == item[me.itemId]) {
@@ -176,9 +196,15 @@ export default {
             me.tempName = me.currentName;
           }
         } else {
-          me.currentId = me.dataCombobox[0][me.itemId];
-          me.currentName = me.dataCombobox[0][me.itemName];
-          me.tempName = me.currentName;
+          if (me.fieldType != "pageSize") {
+            me.currentId = me.dataCombobox[0][me.itemId];
+            me.currentName = me.dataCombobox[0][me.itemName];
+            me.tempName = me.currentName;
+          } else {
+            me.currentId = me.dataCombobox[2][me.itemId];
+            me.currentName = me.dataCombobox[2][me.itemName];
+            me.tempName = me.currentName;
+          }
         }
       } catch (error) {
         console.log(error);
@@ -216,10 +242,6 @@ export default {
             },
             {
               PropertiesOfMaterialsId: "MHK212",
-              PropertiesOfMaterialsName: "Đồ uống đóng chai",
-            },
-            {
-              PropertiesOfMaterialsId: "MHK212",
               PropertiesOfMaterialsName: "Mặt hàng khác",
             },
           ];
@@ -233,6 +255,22 @@ export default {
             {
               StopUsing: 1,
               StopUsingName: "Có",
+            },
+          ];
+          break;
+        case "pageSize":
+          me.dataCombobox = [
+            {
+              PageSizeCode: "25",
+              PageSize: 25,
+            },
+            {
+              PageSizeCode: "50",
+              PageSize: 50,
+            },
+            {
+              PageSizeCode: "100",
+              PageSize: 100,
             },
           ];
           break;
@@ -250,7 +288,7 @@ export default {
       this.tempName = this.currentName;
       this.opened = false;
       this.$emit("input", itemValue);
-      this.$emit("dropdownOnSelect");
+      this.$emit("comboboxOnSelect");
       this.isValid = true;
       this.isRequiredValid = true;
     },
@@ -321,6 +359,7 @@ export default {
       if (index < 0) {
         this.currentId = -1;
         this.currentFocus = -1;
+        this.tempName = "";
         return;
       }
 
@@ -372,12 +411,4 @@ export default {
 </script>
 <style scoped>
 @import "../../css/base/combobox.css";
-
-.combobox-list.isshow {
-  display: block;
-}
-
-.combobox-list.isnone {
-  display: none;
-}
 </style>

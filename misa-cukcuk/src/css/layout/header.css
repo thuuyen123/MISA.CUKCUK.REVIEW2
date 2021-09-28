@@ -31,6 +31,7 @@
     justify-content: space-between;
     align-items: center;
     flex-basis: calc(100% - 230px);
+    padding-left: 10px;
 }
 .header .header-info-account{
     display: flex;

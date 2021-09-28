@@ -30,7 +30,7 @@
 }
 
 .m-btn[type="secondary"] {
-    height: 25px;
+    height: 22px;
     border: 1px solid transparent;
     background-color: transparent;
     border-radius: 3px;
@@ -43,7 +43,8 @@
 }
 
 .m-btn[type="secondary"]:active, .m-btn[type="secondary"]:hover {
-    background-color: #eeeeee !important;
+    background-color: #ebebeb !important;
+    border: 1px solid #d8d8d8 !important;
 }
 
 .m-btn-text {
@@ -69,7 +70,14 @@
     background-color: #fff;
     border: 1px solid #0072bc !important;
 }
-.m-btn[type="control"] .m-btn-text,
-.m-btn[type="default"] .m-btn-text{
+
+.m-btn[type="control"] .m-btn-text, .m-btn[type="default"] .m-btn-text {
     padding: 0px 5px;
+}
+
+.m-popup .m-btn[type="control"] {
+    border-color: rgb(204, 204, 204);
+    background-color: rgb(252, 252, 252) !important;
+    background-image: -webkit-linear-gradient(top, rgb(242, 242, 242), rgb(224, 224, 224)) !important;
+    min-width: 75px;
 }

@@ -93,7 +93,7 @@
 }
 
 .icon-form-invalid {
-    background-position: 0 -1808px !important;
+    background: url(../../assets/images/icon-invalid.png) no-repeat;
     width: 16px;
     height: 16px;
 }
@@ -134,8 +134,8 @@
     height: 16px;
 }
 
-.icon-page-last {
-    background: url(../../assets/images/page-last.png) no-repeat;
+.icon-page-first {
+    background: url(../../assets/images/page-first.png) no-repeat;
     width: 16px;
     height: 16px;
 }
@@ -146,20 +146,20 @@
     height: 16px;
 }
 
-.icon-page-first {
-    background: url(../../assets/images/page-first.png) no-repeat;
-    width: 16px;
-    height: 16px;
-}
-
 .icon-page-next {
     background: url(../../assets/images/page-next.png) no-repeat;
     width: 16px;
     height: 16px;
 }
 
+.icon-page-last {
+    background: url(../../assets/images/page-last.png) no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
 .tool-sprites {
-    background: url('../../assets/images/tool-sprites.png') no-repeat;
+    background: url(../../assets/images/tool-sprites.png) no-repeat;
     background-color: transparent;
 }
 
@@ -170,7 +170,7 @@
 }
 
 .icon-tool-zoom {
-    background-position: 0 32px !important;
+    background-position: 0 -32px !important;
     width: 16px;
     height: 16px;
 }
@@ -181,23 +181,42 @@
     height: 16px;
 }
 
-.icon-feedback{
+.icon-feedback {
     background: url(../../assets/images/viewEmail.png) no-repeat;
     width: 16px;
     height: 16px;
 }
 
-.icon-btnLoadPaging{
+.icon-btnLoadPaging {
     background: url(../../assets/images/refresh.png) no-repeat;
     width: 16px;
     height: 16px;
     margin: 0 !important;
-
 }
 
-.x-form-trigger-default{
+.x-form-trigger-default {
     background: #fff url(../../assets/images/trigger.png) no-repeat;
     background-position: 0 center;
-    width: 22px;
-    height: 21px;
+    width: 21px;
+    height: 18px;
+}
+
+.x-grid-checkcolunm {
+    background-image: url(../../assets/images/checkbox.png);
+    background-repeat: no-repeat;
+    background-position: -1px -1px;
+    width: 14px;
+    height: 14px;
+}
+
+.x-item-disabled .x-grid-checkcolumn{
+    opacity: .9;
+}
+
+.x-grid-item{
+    background-color: #c1ddf1 !important;
+}
+
+.x-grid-item-selected{
+    background-color: #c1ddf1 !important;
 }
