@@ -1,0 +1,14 @@
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\bin\Debug\net5.0\MISA.ApplicationCore.deps.json
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\bin\Debug\net5.0\MISA.ApplicationCore.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\bin\Debug\net5.0\ref\MISA.ApplicationCore.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\bin\Debug\net5.0\MISA.ApplicationCore.pdb
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.csproj.AssemblyReference.cache
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.Properties.ResourcesVN.resources
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.csproj.GenerateResource.cache
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.AssemblyInfoInputs.cache
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.AssemblyInfo.cs
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.csproj.CoreCompileInputs.cache
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\ref\MISA.ApplicationCore.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.ApplicationCore\obj\Debug\net5.0\MISA.ApplicationCore.pdb

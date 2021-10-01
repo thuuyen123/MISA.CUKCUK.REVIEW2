@@ -1,0 +1,51 @@
+input {
+    font-size: 13px;
+    color: #000;
+    font-family: Tahoma-Regular;
+    border: none;
+    outline: 0;
+}
+
+input[type="checkbox"] {
+    height: 15px;
+    width: 15px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+input[type="checkbox"]::after {
+    width: 15px;
+    height: 15px;
+    box-sizing: border-box;
+    top: 0px;
+    left: 0px;
+    position: relative;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    background-color: white;
+    content: "";
+    display: inline-block;
+    visibility: visible;
+}
+
+input[type="checkbox"]:checked {
+    animation: turn 0.1s linear;
+}
+
+input[type="checkbox"]:checked::after {
+    width: 15px;
+    height: 15px;
+    box-sizing: border-box;
+    top: 0px;
+    left: 0px;
+    position: relative;
+    border-radius: 2px;
+    border: 1px solid #0072bc;
+    background-image: url("../../assets/images/tick.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: white;
+    content: "";
+    display: inline-block;
+    visibility: visible;
+}

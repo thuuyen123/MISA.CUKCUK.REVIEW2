@@ -1,0 +1,15 @@
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.AssemblyInfo.cs
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\bin\Debug\net5.0\MISA.Infrastructure.deps.json
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\bin\Debug\net5.0\MISA.Infrastructure.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\bin\Debug\net5.0\ref\MISA.Infrastructure.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\bin\Debug\net5.0\MISA.Infrastructure.pdb
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\bin\Debug\net5.0\MISA.ApplicationCore.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\bin\Debug\net5.0\MISA.ApplicationCore.pdb
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.csproj.CopyComplete
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\ref\MISA.Infrastructure.dll
+C:\Users\Thu Uyen\Desktop\MISA.CUKCUK\MISA.CUKCUK.BE\MISA.CUKCUK.GPBL\MISA.Infrastructure\obj\Debug\net5.0\MISA.Infrastructure.pdb

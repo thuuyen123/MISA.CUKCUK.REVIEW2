@@ -1,0 +1,47 @@
+
+.x-toolbar {
+    position: relative;
+}
+
+.x-toolbar.paging-toolbar {
+    height: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 15px 3px 2px;
+}
+
+.paging-toolbar .paging-toolbar-setting .p-paging-index {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    align-items: center;
+}
+
+.p-paging-index .p-index-left, .p-paging-index .p-index-center, .p-paging-index .p-index-right {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+}
+
+.p-index-center #txtPageIndex {
+    width: 38px;
+    height: 22px;
+    color: #000;
+    padding: 3px 5px 3px!important;
+    background-color: #fff;
+    font-family: Tahoma-Regular;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+}
+
+.p-index-center #txtPageIndex:active, .p-index-center #txtPageIndex:hover, .p-index-center #txtPageIndex:focus {
+    border-color: #0072bc !important;
+}
+.p-index-center>span,
+.p-paging-display-records{
+    white-space: nowrap;
+}

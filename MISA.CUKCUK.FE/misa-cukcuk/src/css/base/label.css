@@ -1,0 +1,14 @@
+.label-field-input {
+    display: flex;
+    padding-bottom: 6px;
+}
+.label-field-input > label {
+    font-size: 12px;
+    display: block;
+    margin-bottom: 4px;
+    flex-basis: 30%;
+
+}
+.input-border-red{
+    border-color: #f65454 !important;
+}
