@@ -7,7 +7,7 @@
 
     FORM_CHANGED: "Dữ liệu đã bị thay đổi. Bạn có muốn cất không?",
 
-    DELETE_EMPLOYEE: "Bạn có thực sự muốn xóa {0} <{1}> không?",
+    MSG_DEL: "Bạn có chắc chắn muốn xóa {0} <<{1}>> không?",
 
     CANT_BE_NULL: "{0} không được phép để trống",
 

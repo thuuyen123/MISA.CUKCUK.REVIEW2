@@ -136,15 +136,60 @@ namespace MISA.ApplicationCore.Entities
         [DisplayName("Id đơn vị tính")]
         public Guid? UnitId { get; set; }
 
-
         /// <summary>
         /// Tên đơn vị tínnh
         /// </summary>
         /// Created By : TTUyen (29/9/2021)
         [DisplayName("Tên đơn vị tính")]
+
+
+        /// <summary>
+        /// Tên đơn vị tínnh
+        /// </summary>
+        /// Created By : TTUyen (29/9/2021)
         public string UnitName { get; set; }
 
+        /// <summary>
+        /// Đơn vị chuyển đổi
+        /// </summary>
+        /// Created By : TTUyen (29/9/2021)
+        [DisplayName("Đơn vị chuyển đổi")]
+        public Guid? UnitConvertId { get; set; }
 
+        /// <summary>
+        /// Tỷ lệ chuyển đổi
+        /// </summary>
+        /// Created By : TTUyen (29/9/2021)
+        [DisplayName("Tỷ lệ chuyển đổi")]
+        public int ConvertRate { get; set; }
+
+        /// <summary>
+        /// Phép tính
+        /// </summary>
+        /// Created By : TTUyen (29/9/2021)
+        [DisplayName("Phép tính")]
+        public string ConvertRateOperate { get; set; }
+
+        /// <summary>
+        /// Mô tả chuyển đổi
+        /// </summary>
+        /// Created By : TTUyen (29/9/2021)
+        [DisplayName("Mô tả chuyển đổi")]
+        public string Note { get; set; }
+
+        /// <summary>
+        /// NVL cha
+        /// </summary>
+        /// Created By : TTUyen (29/9/2021)
+        [DisplayName("NVL cha")]
+        public Guid? ParentId { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// Created By : TTUyen (29/9/2021)
+        [MISANotMap]
+        public List<Material> MaterialDetails { get; set; }
         #endregion
 
     }

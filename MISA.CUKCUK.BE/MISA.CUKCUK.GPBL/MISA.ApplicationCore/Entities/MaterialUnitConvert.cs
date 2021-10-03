@@ -73,5 +73,7 @@ namespace MISA.ApplicationCore.Entities
         ///  Created By : TTUyen ( 29/09/2021)
         [DisplayName("Tên đơn vị tính")]
         public string UnitName { get; set; }
+
+
     }
 }

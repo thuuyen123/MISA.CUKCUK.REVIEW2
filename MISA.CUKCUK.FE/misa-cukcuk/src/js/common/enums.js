@@ -25,5 +25,5 @@ export const STATUS_CODE = {
  * CreateBy: TTUyen (07/09/2021)
  */
 export const MATERIAL_TEXT = {
-    DISPLAY_NAME: "Nhân viên",
+    DISPLAY_NAME: "Nguyên vật liệu",
 }

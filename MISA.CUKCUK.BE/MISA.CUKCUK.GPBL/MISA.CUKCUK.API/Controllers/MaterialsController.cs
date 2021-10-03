@@ -59,7 +59,7 @@ namespace MISA.CukCuk.Api.Controllers
                 var materialCode = _materialService.GetNewMaterialCodeByMaterialName(materialName);
                 _serviceResult.Data = materialCode;
                 _serviceResult.Status = RequestStatus.Complete;
-                return StatusCode(200, _serviceResult.Data);
+                return StatusCode(200, _serviceResult);
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ namespace MISA.CukCuk.Api.Controllers
         /// <returns>Danh sách nhân viên theo điều kiện lọc</returns>
         /// Created By : TTUyen (30/9/2021)
 
-        [HttpGet("Filter")]
+        [HttpPost("Filter")]
         public IActionResult GetEmployeesByPaging([FromQuery] MaterialFilter materialFilter, [FromBody] List<FilterItem> listFilter)
         {
             try

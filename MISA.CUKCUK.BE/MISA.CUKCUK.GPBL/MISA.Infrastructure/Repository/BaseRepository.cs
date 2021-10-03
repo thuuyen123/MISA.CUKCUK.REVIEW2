@@ -53,31 +53,41 @@ namespace MISA.Infrastructor.Repository
         /// <param name="entity">Bản ghi cần thêm</param>
         /// <returns>Trả về số bản ghi được thêm</returns>
         /// CreateBy: TTUyen
-        public int Add(TEntity entity)
+        public virtual int Add(TEntity entity)
         {
-            var rowEffects = 0;
-
-            _dbConnection = new MySqlConnection(_connectionString);
-            _dbConnection.Open();
-
-            using (var transaction = _dbConnection.BeginTransaction())
+            try
             {
-                try
-                {
-                    var parameters = MappingDbType(entity);
+                var rowEffects = 0;
 
-                    rowEffects = _dbConnection.Execute($"Proc_Insert{_tagName}", param: parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
+                _dbConnection = new MySqlConnection(_connectionString);
+                _dbConnection.Open();
 
-                    transaction.Commit();
-                }
-                catch (Exception)
+                using (var transaction = _dbConnection.BeginTransaction())
                 {
-                    transaction.Rollback();
-                    throw;
+                    try
+                    {
+                        var parameters = MappingDbType(entity);
+
+                        rowEffects = _dbConnection.Execute($"Proc_Insert{_tagName}", param: parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
+
+                return rowEffects;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return 0;
             }
 
-            return rowEffects;
+
         }
 
         /// <summary>
@@ -88,32 +98,41 @@ namespace MISA.Infrastructor.Repository
         ///  CreateBy: TTUyen
         public int Delete(Guid entityId)
         {
-            _dbConnection = new MySqlConnection(_connectionString);
-
-            _dbConnection.Open();
-
-            var rowEffects = 0;
-
-            using (var transaction = _dbConnection.BeginTransaction())
+            try
             {
-                try
+                _dbConnection = new MySqlConnection(_connectionString);
+
+                _dbConnection.Open();
+
+                var rowEffects = 0;
+
+                using (var transaction = _dbConnection.BeginTransaction())
                 {
-                    var parameters = new DynamicParameters();
+                    try
+                    {
+                        var parameters = new DynamicParameters();
 
-                    parameters.Add($"@${_tagName}Id", entityId);
+                        parameters.Add($"@${_tagName}Id", entityId);
 
-                    rowEffects = _dbConnection.Execute($"Proc_Delete{_tagName}ById", param: parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
+                        rowEffects = _dbConnection.Execute($"Proc_Delete{_tagName}ById", param: parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
 
-                    transaction.Commit();
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
+
+                return rowEffects;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return 0;
             }
 
-            return rowEffects;
         }
 
         /// <summary>
@@ -123,15 +142,24 @@ namespace MISA.Infrastructor.Repository
         ///  CreateBy: TTUyen
         public IEnumerable<TEntity> Get()
         {
-            _dbConnection = new MySqlConnection(_connectionString);
+            try
+            {
+                _dbConnection = new MySqlConnection(_connectionString);
 
-            _dbConnection.Open();
+                _dbConnection.Open();
 
-            var sql = $"Proc_Get{_tagName}s";
+                var sql = $"Proc_Get{_tagName}s";
 
-            var entities = _dbConnection.Query<TEntity>(sql, commandType: CommandType.StoredProcedure);
+                var entities = _dbConnection.Query<TEntity>(sql, commandType: CommandType.StoredProcedure);
 
-            return entities;
+                return entities;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+
         }
 
         /// <summary>
@@ -142,17 +170,26 @@ namespace MISA.Infrastructor.Repository
         /// CreateBy: TTUyen
         public TEntity GetById(Guid entityId)
         {
-            _dbConnection = new MySqlConnection(_connectionString);
+            try
+            {
+                _dbConnection = new MySqlConnection(_connectionString);
 
-            _dbConnection.Open();
+                _dbConnection.Open();
 
-            var parameters = new DynamicParameters();
+                var parameters = new DynamicParameters();
 
-            parameters.Add($"@${_tagName}Id", entityId);
+                parameters.Add($"@${_tagName}Id", entityId);
 
-            var res = _dbConnection.Query<TEntity>($"Proc_Get{_tagName}ById", param: parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
-   
-            return res;
+                var res = _dbConnection.Query<TEntity>($"Proc_Get{_tagName}ById", param: parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+
         }
 
         /// <summary>
@@ -161,30 +198,40 @@ namespace MISA.Infrastructor.Repository
         /// <param name="entity"></param>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        public int Update(TEntity entity, Guid entityId)
+        public virtual int Update(TEntity entity, Guid entityId)
         {
             var rowEffects = 0;
 
-            _dbConnection = new MySqlConnection(_connectionString);
-
-            _dbConnection.Open();
-
-            using (var transaction = _dbConnection.BeginTransaction())
+            try
             {
-                try
-                {
-                    var parameters = MappingDbType(entity);
+                _dbConnection = new MySqlConnection(_connectionString);
 
-                    rowEffects = _dbConnection.Execute($"Proc_Update{_tagName}", param: parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
+                _dbConnection.Open();
 
-                    transaction.Commit();
-                }
-                catch (Exception)
+                using (var transaction = _dbConnection.BeginTransaction())
                 {
-                    transaction.Rollback();
-                    throw;
+                    try
+                    {
+                        var parameters = MappingDbType(entity);
+
+                        rowEffects = _dbConnection.Execute($"Proc_Update{_tagName}", param: parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
+
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return 0;
+            }
+
 
             return rowEffects;
         }
@@ -197,29 +244,45 @@ namespace MISA.Infrastructor.Repository
         /// <returns>dynamic parameters đã được format đúng</returns>
         protected DynamicParameters MappingDbType(TEntity entity)
         {
-            var properties = entity.GetType().GetProperties();
 
-            var parameters = new DynamicParameters();
-
-            foreach (var property in properties)
+            try
             {
-                var propertyName = property.Name;
+                var properties = entity.GetType().GetProperties();
 
-                var propertyValue = property.GetValue(entity);
+                var parameters = new DynamicParameters();
 
-                var propertyType = property.PropertyType;
-
-                if (propertyType == typeof(Guid) || propertyType == typeof(Guid?))
+                foreach (var property in properties)
                 {
-                    parameters.Add($"@${propertyName}", propertyValue, DbType.String);
+                    var propertyName = property.Name;
+
+                    var notMapPro = property.GetCustomAttributes(typeof(MISANotMap), true);
+
+                    if (notMapPro.Length == 0)
+                    {
+
+                        var propertyValue = property.GetValue(entity);
+
+                        var propertyType = property.PropertyType;
+
+                        if (propertyType == typeof(Guid) || propertyType == typeof(Guid?))
+                        {
+                            parameters.Add($"@${propertyName}", propertyValue, DbType.String);
+                        }
+                        else
+                        {
+                            parameters.Add($"@${propertyName}", propertyValue);
+                        }
+                    }
                 }
-                else
-                {
-                    parameters.Add($"@${propertyName}", propertyValue);
-                }
+
+                return parameters;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
             }
 
-            return parameters;
         }
 
         /// <summary>
@@ -237,28 +300,39 @@ namespace MISA.Infrastructor.Repository
 
         public TEntity CheckDuplicateByProp(TEntity entity, PropertyInfo property)
         {
-            _dbConnection = new MySqlConnection(_connectionString);
 
-            _dbConnection.Open();
+            try
+            {
+                _dbConnection = new MySqlConnection(_connectionString);
 
-            var parameters = new DynamicParameters();
-            var propName = property.Name;
+                _dbConnection.Open();
 
-            var entityId = entity.GetType().GetProperty($"{_tagName}Id").GetValue(entity);
+                var parameters = new DynamicParameters();
+                var propName = property.Name;
 
-            var propertyValue = entity.GetType().GetProperty(propName).GetValue(entity);
+                var entityId = entity.GetType().GetProperty($"{_tagName}Id").GetValue(entity);
 
-            parameters.Add($"@$TableName", _tagName);
+                var propertyValue = entity.GetType().GetProperty(propName).GetValue(entity);
 
-            parameters.Add($"@$PropertyValue", propertyValue);
+                parameters.Add($"@$TableName", _tagName);
 
-            parameters.Add($"@$EntityState", entity.EntityState);
+                parameters.Add($"@$PropertyValue", propertyValue);
 
-            parameters.Add($"@$EntityId", entityId);
+                parameters.Add($"@$EntityState", entity.EntityState);
 
-            var res = _dbConnection.QueryFirstOrDefault<TEntity>("Proc_CheckDuplicateByProperty", param: parameters, commandType: CommandType.StoredProcedure);
+                parameters.Add($"@$EntityId", entityId);
 
-            return res;
+                var res = _dbConnection.QueryFirstOrDefault<TEntity>("Proc_CheckDuplicateByProperty", param: parameters, commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+
+
 
         }
     }

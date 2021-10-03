@@ -18,10 +18,20 @@
           >
             Thêm
           </BaseButton>
-          <BaseButton type="control" iconClass="sprite icon-btnDuplicate">
+          <BaseButton
+            @btn-click="changeStatusForm(false, 'clone', dataMaterial)"
+            type="control"
+            iconClass="sprite icon-btnDuplicate"
+          >
             Nhân bản
           </BaseButton>
-          <BaseButton type="control" iconClass="icon-btnEdit"> Sửa </BaseButton>
+          <BaseButton
+            @btn-click="changeStatusForm(false, 'edit', dataMaterial)"
+            type="control"
+            iconClass="icon-btnEdit"
+          >
+            Sửa
+          </BaseButton>
           <BaseButton
             type="control"
             iconClass="sprite icon-btnDelete"
@@ -29,14 +39,30 @@
           >
             Xóa
           </BaseButton>
-          <BaseButton type="control" iconClass="sprite icon-refresh">
+          <BaseButton
+            type="control"
+            iconClass="sprite icon-refresh"
+            @btn-click="reloadData"
+          >
             Nạp
           </BaseButton>
         </div>
         <div class="m-panel main-gridpanel">
-          <BaseTable ref="tableMaterial" :tableData="tableMaterial" />
+          <BaseTable
+            ref="tableMaterial"
+            :tableData="tableMaterial"
+            :isChecked="isChecked"
+            @changeSelectedTr="changeSelectedTr"
+            @btnEditOnDbClick="changeStatusForm"
+          />
         </div>
-          <BasePaging />
+        <BasePaging
+          :totalRecord="totalRecord"
+          :totalPages="totalPages"
+          @changePageIndex="changePageIndex"
+          @changePageSize="changePageSize"
+          @btnReloadDataTable="btnReloadDataTable"
+        />
       </div>
     </div>
     <MaterialDetail :status="recordStatus" />
@@ -46,11 +72,12 @@
       btn2="Không"
       type="confirm-del"
       icon="icon-question"
-      @close="btnCancleDelete"
-      @confirm="btnConfirmDelete"
+      @btnClose="btnCancelDel"
+      @btnConfirm="btnConfirmDel"
     >
       {{ contentTextDel }}
     </BasePopup>
+    <BaseLoading :showLoader="isShowLoader" />
   </div>
 </template>
 <script>
@@ -58,11 +85,14 @@ import BaseButton from "../../components/base/BaseButton.vue";
 import BaseTable from "../../components/base/BaseTable.vue";
 import BasePopup from "../../components/base/BasePopup.vue";
 import BasePaging from "../../components/base/BasePaging.vue";
-import { FORM_STATE } from "../../js/common/enums";
+import BaseLoading from "../../components/base/BaseLoading.vue";
+import { FORM_STATE, STATUS_CODE } from "../../js/common/enums";
 import { MESSAGE } from "../../js/common/const";
 import { MATERIAL_TEXT } from "../../js/common/enums";
 import MaterialDetail from "./MaterialDetail.vue";
-
+import { eventBus } from "../../main.js";
+import axios from "axios";
+import { CONFIG } from "../../js/common/config";
 export default {
   name: "MaterialList",
   components: {
@@ -71,6 +101,7 @@ export default {
     MaterialDetail,
     BasePopup,
     BasePaging,
+    BaseLoading,
   },
   data() {
     return {
@@ -94,9 +125,9 @@ export default {
             idType: "txtMaterialName",
           },
           {
-            id: "PropertiesOfMaterialsHead",
+            id: "PropertiesOfMaterialNameHead",
             style: "min-width: 100px; max-width: 150px !important",
-            fieldname: "PropertiesOfMaterials",
+            fieldname: "PropertiesOfMaterialName",
             title: "Tính chất",
             typeFilter: "combo",
             idType: "cbxPropertiesOfMaterials",
@@ -110,9 +141,9 @@ export default {
             idType: "txtUnitName",
           },
           {
-            id: "MaterialGroupHead",
+            id: "MaterialGroupNameHead",
             style: "min-width: 100px; max-width: 150px !important;",
-            fieldname: "MaterialGroup",
+            fieldname: "MaterialGroupName",
             title: "Nhóm nguyên vật liệu",
             typeFilter: "input",
             idType: "txtMaterialGroup",
@@ -134,101 +165,19 @@ export default {
             idType: "cbxStopUsing",
           },
         ],
-        data: [
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 1,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống Đồ uống Đồ uống Đồ uống Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-          {
-            MaterialCode: "COCACOLA",
-            MaterialName: "Cooca côla",
-            PropertiesOfMaterials: "Đồ uống",
-            UnitName: "Lon",
-            MaterialGroup: "Sản phẩm",
-            Note: "Oke",
-            StopUsing: 0,
-          },
-        ],
+        data: [],
         name: "tbMaterial",
       },
 
+      filterList: [
+        {
+          DataField: "MaterialCode",
+          FilterOption: "1",
+          FilterType: "FilterText",
+          FilterValue: "",
+          Enable: false,
+        },
+      ],
       recordStatus: {
         isHide: true,
         formMode: FORM_STATE.ADD,
@@ -240,29 +189,84 @@ export default {
       isHidePopupDelete: true,
 
       contentTextDel: "",
+
+      isShowLoader: false,
+
+      totalRecord: 0,
+
+      pageIndex: 1,
+
+      pageSize: 100,
+
+      totalPages: 1,
+
+      isChecked: [],
+
+      idItemSelected: "",
+
+      nameMaterial: "",
+
+      dataMaterial: [],
     };
   },
+
+  created() {
+    this.loadDataTable();
+    setTimeout(() => {
+      this.idItemSelected = this.tableMaterial.data[0].MaterialId;
+      this.nameMaterial = this.tableMaterial.data[0].MaterialName;
+      this.dataMaterial = this.tableMaterial.data;
+    }, 150);
+  },
   methods: {
-
-    loadDataTable(){
-
-    },
     /**
-     * Hàm hiển thị popup xác nhận xóa
-     * CreateBy: TTUyen(27/09/2021)
+     * Hàm load dữ liệu phân trang
      */
-    btnShowDelete() {
-      this.isHidePopupDelete = false;
-      setTimeout(() => {
-        // var employeeCode = this.cloneData.EmployeeCode;
-        this.contentTextDel = MESSAGE.DELETE_EMPLOYEE.format(
-          MATERIAL_TEXT.DISPLAY_NAME,
-          "Mã"
-        );
-      }, 150);
+    async loadDataTable() {
+      let me = this;
+      me.reloading();
+      try {
+        await axios
+          .post(
+            CONFIG.MY_URL +
+              "Materials/Filter?pageSize=" +
+              me.pageSize +
+              "&pageIndex=" +
+              me.pageIndex,
+            me.filterList
+          )
+          .then((res) => {
+            if (res.status != STATUS_CODE.NO_CONTENT) {
+              me.tableMaterial.data = res.data.Data;
+              me.totalPages = res.data.TotalPage;
+              me.totalRecord = res.data.TotalRecord;
+            } else {
+              me.tableMaterial.data = [];
+              me.totalRecord = 0;
+              me.totalPages = 1;
+              me.isChecked = new Array(me.tableMaterial.data.length).fill(
+                false
+              );
+            }
+          })
+          .catch(() => {
+            this.$toast.error(MESSAGE.EXCEPTION_MSG, {
+              position: "bottom-right",
+              timeout: 2000,
+            });
+          });
+
+        me.closeReloading();
+      } catch (error) {
+        console.log(error);
+      }
     },
 
-    changeStatusForm(isHide, formMode = FORM_STATE.ADD, data = []) {
+    /**
+     * Hiển thị form dialog
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    async changeStatusForm(isHide, formMode = FORM_STATE.ADD, data = []) {
       this.recordStatus.isHide = false;
       setTimeout(() => {
         this.recordStatus = {
@@ -270,9 +274,136 @@ export default {
           formMode: formMode,
           data: data,
         };
-        // this.reloadData();
       }, 150);
     },
+    /**
+     * Thay đổi item đã lựa chọn
+     */
+    changeSelectedTr(value, data) {
+      this.isChecked = new Array(this.tableMaterial.data.length).fill(false);
+      this.isChecked[value] = true;
+      this.idItemSelected = data.MaterialId;
+      this.nameMaterial = data.MaterialName;
+      this.dataMaterial = data;
+      // console.log(this.idItemSelected);
+      // console.log(this.nameMaterial);
+    },
+
+    /**
+     * Hàm hủy xóa bản ghi
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    btnCancelDel() {
+      this.isHidePopupDelete = true;
+    },
+
+    /**
+     * Hàm xóa dữ liệu trong database
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    async btnConfirmDel() {
+      let me = this;
+      try {
+        await axios
+          .delete(CONFIG.MY_URL + `Materials/${me.idItemSelected}`)
+          .then((res) => {
+            if (res.status == 200) {
+              this.$toast.success(MESSAGE.DELETE_MSG_SUCCESS, {
+                position: "bottom-right",
+                timeout: 2000,
+              });
+            } else {
+              this.$toast.error(MESSAGE.ERROR_DELETE_NOSUCCES, {
+                position: "bottom-right",
+                timeout: 2000,
+              });
+            }
+          })
+          .catch(() => {
+            this.$toast.error(MESSAGE.EXCEPTION_MSG, {
+              position: "bottom-right",
+              timeout: 2000,
+            });
+          });
+      } catch (error) {
+        console.log(error);
+      }
+      me.reloadData();
+      this.isHidePopupDelete = true;
+    },
+    /**
+     * Hàm phân lại trang khi thay đổi vị trí trang
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    changePageIndex(pageIndex) {
+      this.pageIndex = pageIndex;
+      this.loadDataTable();
+    },
+
+    /**
+     * Hàm phân lại trang khi thay đổi số bản ghi trong trang
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    changePageSize(pageSize) {
+      this.pageSize = pageSize;
+      this.loadDataTable();
+    },
+    /**
+     * Hàm Ẩn/hiện Loader
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    reloading() {
+      this.isShowLoader = true;
+      setTimeout(() => {
+        this.isShowLoader = false;
+      }, 1500);
+    },
+
+    /**
+     * Hàm tắt loader
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    closeReloading() {
+      this.isHideLoader = true;
+    },
+    /**
+     * Hàm hiển thị popup xác nhận xóa
+     * CreateBy: TTUyen(02/10/2021)
+     */
+    btnShowDelete() {
+      this.isHidePopupDelete = false;
+      setTimeout(() => {
+        this.contentTextDel = MESSAGE.MSG_DEL.format(
+          MATERIAL_TEXT.DISPLAY_NAME,
+          this.nameMaterial
+        );
+      }, 150);
+    },
+
+    /**
+     * Hàm tải lại dữ liệu table qua paging
+     */
+    btnReloadDataTable() {
+      this.loadDataTable();
+    },
+    /**
+     * Tải lại dữ liệu
+     * CreateBy: TTUyen (02/10/2021)
+     */
+    reloadData() {
+      this.pageIndex = 1;
+      this.loadDataTable();
+    },
+
+    onShowLoaderFull() {
+      eventBus.$emit("showLoaderFull");
+    },
+
+    onHideLoaderFile() {
+      eventBus.$emit("hideLoaderFull");
+    },
+
+ 
   },
 };
 </script>

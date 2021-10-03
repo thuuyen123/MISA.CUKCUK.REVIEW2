@@ -11,6 +11,7 @@ namespace MISA.ApplicationCore.Entities
     {
         #region Property
   
+        [MISANotMap]
         public EntityState EntityState { get; set; } = EntityState.AddNew;
         /// <summary>
         /// Ngày tạo

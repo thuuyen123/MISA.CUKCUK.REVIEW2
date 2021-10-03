@@ -5,17 +5,35 @@
       <the-menu />
       <the-content />
     </div>
+    <BaseLoading :showLoader="isShowLoadFull" />
   </div>
 </template>
 <script>
 import TheContent from "./components/layout/TheContent.vue";
 import TheHeader from "./components/layout/TheHeader.vue";
 import TheMenu from "./components/layout/TheMenu.vue";
+import BaseLoading from "./components/base/BaseLoading.vue";
+import { eventBus } from "./main";
 export default {
   components: {
     TheContent,
     TheHeader,
     TheMenu,
+    BaseLoading,
+  },
+  data() {
+    return {
+      isShowLoadFull: false,
+    };
+  },
+  created() {
+    eventBus.$on("showLoaderFull", () => {
+      this.isShowLoadFull = true;
+    });
+
+    eventBus.$on("hideLoaderFull", () => {
+      this.isShowLoadFull = true;
+    });
   },
 };
 </script>

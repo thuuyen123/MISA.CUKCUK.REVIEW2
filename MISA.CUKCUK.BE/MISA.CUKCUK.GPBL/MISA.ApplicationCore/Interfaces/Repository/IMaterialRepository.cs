@@ -26,6 +26,5 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         Paging<Material> GetMaterialsByPagingFilter(MaterialFilter filter, List<FilterItem> listFilter );
 
 
-
     }
 }

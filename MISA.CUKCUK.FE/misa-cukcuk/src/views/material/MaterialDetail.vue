@@ -42,6 +42,7 @@
                     itemName="UnitName"
                     :required="true"
                     tabindex="3"
+                    styleList="height: 266px; overflow: auto;"
                     @btnShowFormAdd="btnShowFormAdd"
                   />
                   <div class="x-form-error" v-if="isError[1] == true">
@@ -64,13 +65,13 @@
                   />
                   <BaseCombobox
                     type="combo"
-                    ref="inputExpriryType"
-                    id="txtExpriryType"
-                    fieldType="expriryType"
+                    ref="inputExprityType"
+                    id="txtExprityType"
+                    fieldType="exprityType"
                     displayName="Kiểu hạn sử dụng"
                     value=""
-                    itemId="ExpriryType"
-                    itemName="ExpriryTypeName"
+                    itemId="ExprityType"
+                    itemName="ExprityTypeName"
                     tabindex="5"
                   />
                 </div>
@@ -104,6 +105,7 @@
                   value=""
                   itemId="StockId"
                   itemName="StockName"
+                  itemCode="StockCode"
                   tabindex="4"
                   @btnShowFormAdd="btnShowFormAdd"
                 />
@@ -150,7 +152,11 @@
               </div>
             </div>
             <div class="form-table-body">
-              <base-table ref="tableUnit" :tableData="tableUnitConvert" />
+              <BaseTable
+                ref="tableUnit"
+                :tableData="tableUnitConvert"
+                :isChecked="isChecked"
+              />
             </div>
             <div class="form-table-btn">
               <BaseButton
@@ -230,8 +236,10 @@ import BaseTable from "../../components/base/BaseTable.vue";
 import BasePopupForm from "../../components/base/BasePopupForm.vue";
 import BasePopup from "../../components/base/BasePopup.vue";
 import BaseButton from "../../components/base/BaseButton.vue";
-// import { MESSAGE } from "../../js/common/const";
-// import { FORM_STATE, STATUS_CODE } from "../../js/common/enums";
+import { MESSAGE } from "../../js/common/const";
+import { FORM_STATE } from "../../js/common/enums";
+import axios from "axios";
+import { CONFIG } from "../../js/common/config";
 export default {
   name: "MaterialDetail",
   components: {
@@ -279,6 +287,15 @@ export default {
       materialDetail: {
         MaterialCode: "",
         MaterialName: "",
+        MinimumStock: null,
+        ExprityDate: null,
+        ExprityType: null,
+        StopFollowing: null,
+        MaterialGroupName: "",
+        PropertiesOfMaterialName: "",
+        Description: null,
+        StockId: "",
+        UnitId: "",
       },
       tableUnitConvert: {
         columns: [
@@ -337,14 +354,104 @@ export default {
         name: "tbUnitConvert",
       },
 
+      isChecked: [],
+
       fieldTypeForm: "unit",
+
+      originalMaterial: {},
     };
   },
+  watch: {
+    async status(value) {
+      if (!value.isHide) {
+        this.resetInput();
+        switch (value.formMode) {
+          case FORM_STATE.ADD:
+            this.addForm();
+            break;
+          case FORM_STATE.EDIT:
+            await this.editForm();
+            break;
+          case FORM_STATE.CLONE:
+            await this.cloneForm();
+            break;
+          default:
+            break;
+        }
+      }
+      this.originalMaterial = { ...this.materialDetail };
+    },
+  },
   methods: {
+    /**
+     * Hiển thị form thêm mới
+     * CreateBy: TTUyen (02/10/2021)
+     */
+    addForm() {
+      let me = this;
+      try {
+        me.$refs.inputMaterialName.$refs.input.focus();
+      } catch (e) {
+        this.$toast.error(MESSAGE.EXCEPTION_MSG, {
+          position: "bottom-right",
+          timeout: 2000,
+        });
+      }
+    },
+
+    /**
+     * Hiển thị form sửa
+     *  CreateBy: TTUyen(02/10/2021)
+     */
+    async editForm() {
+      let me = this;
+      if (me.status.data) {
+        me.materialDetail = me.status.data;
+        me.$refs.inputMaterialName.$refs.input.focus();
+      }
+    },
+
+    /**
+     * Hiển thị form nhân bản
+     *  CreateBy: TTUyen(02/10/2021)
+     */
+    async cloneForm() {
+      let me = this;
+      me.materialDetail = me.status.data;
+      let res = await me.getNewCode(me.materialDetail.MaterialName);
+      let newCode = res.data.Data;
+      me.materialDetail.MaterialCode = newCode;
+      me.$refs.inputMaterialName.$refs.input.focus();
+    },
+
+    /**
+     * Lấy mã mới từ API
+     *  CreateBy: TTUyen(02/10/2021)
+     */
+    async getNewCode(name) {
+      try {
+        let res = await axios.get(
+          CONFIG.MY_URL + "Materials/NewMaterialCode?materialName=" + name
+        );
+        return res;
+      } catch (e) {
+        this.$toast.error(MESSAGE.EXCEPTION_MSG, {
+          position: "bottom-right",
+          timeout: 2000,
+        });
+      }
+    },
+    /**
+     * Hiển thị popup form thêm mới
+     */
     btnShowFormAdd(field) {
       this.fieldTypeForm = field;
       this.isShowForm = true;
     },
+
+    /**
+     * Thêm dòng vào bảng đơn vị chuyển đổi
+     */
     btnAddTrTable() {
       this.countRows = this.countRows + 1;
       let newRow = {
@@ -355,6 +462,17 @@ export default {
         Description: "",
       };
       this.tableUnitConvert.data.push(newRow);
+      this.isChecked = new Array(this.tableUnitConvert.data.length).fill(false);
+    },
+
+    /**
+     * Hàm reset lại form khi thoát khỏi form
+     * CreateBy: TTUyen(03/10/2021)
+     */
+    resetInput() {
+      Object.entries(this.materialDetail).forEach(([key]) => {
+        this.materialDetail[key] = "";
+      });
     },
   },
 };
@@ -427,6 +545,7 @@ export default {
   .form-block-3 {
     > .label-field-input:nth-child(1) {
       flex-basis: 100%;
+      align-items: normal;
       textarea {
         flex: 1;
       }

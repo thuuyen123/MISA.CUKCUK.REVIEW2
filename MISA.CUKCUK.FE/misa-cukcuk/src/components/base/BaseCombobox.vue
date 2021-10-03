@@ -44,6 +44,10 @@
       :class="['combobox-list', opened ? 'isshow' : 'isnone']"
       :style="styleList"
     >
+      <!-- <li v-if="fieldType == 'stock'" class="combo-item combo-item-header">
+        <div class="combo-item-text combo-col-1">Mã</div>
+        <div class="combo-item-text combo-col-2">Tên</div>
+      </li> -->
       <li
         v-for="(item, index) in itemList"
         :key="index"
@@ -54,7 +58,10 @@
         ]"
         @click="clickItem(item[itemId], item[itemName])"
       >
-        <div class="combobox-item-text">
+        <!-- <div v-if="fieldType == 'stock'" class="combobox-item-text combo-col-1">
+          {{ item[itemCode] }}
+        </div> -->
+        <div class="combobox-item-text combo-col-2">
           {{ item[itemName] }}
         </div>
       </li>
@@ -65,6 +72,8 @@
 // import axios from "axios";
 import { directive as onClickaway } from "vue-clickaway";
 import { MESSAGE } from "../../js/common/const";
+import axios from "axios";
+import { CONFIG } from "../../js/common/config";
 export default {
   directives: {
     onClickaway: onClickaway,
@@ -75,6 +84,7 @@ export default {
     id: String,
     itemId: String,
     itemName: String,
+    itemCode: String,
     selectedId: String,
     tabindex: String,
     value: String,
@@ -90,8 +100,11 @@ export default {
     styleList: String,
   },
   created() {
-    this.initChoice();
-    this.filteredList("");
+    this.loadDataCombobox();
+    setTimeout(() => {
+      this.initChoice();
+      this.filteredList("");
+    }, 150);
   },
   data() {
     return {
@@ -210,7 +223,7 @@ export default {
         console.log(error);
       }
     },
-    loadDataCombobox() {
+    async loadDataCombobox() {
       let me = this;
       switch (me.fieldType) {
         case "branch":
@@ -233,16 +246,16 @@ export default {
         case "properties":
           me.dataCombobox = [
             {
-              PropertiesOfMaterialsId: "NVL122",
-              PropertiesOfMaterialsName: "Nguyên vật liệu",
+              PropertiesOfMaterialId: "NVL122",
+              PropertiesOfMaterialName: "Nguyên vật liệu",
             },
             {
-              PropertiesOfMaterialsId: "DOC222",
-              PropertiesOfMaterialsName: "Đồ uống đóng chai",
+              PropertiesOfMaterialId: "DOC222",
+              PropertiesOfMaterialName: "Đồ uống đóng chai",
             },
             {
-              PropertiesOfMaterialsId: "MHK212",
-              PropertiesOfMaterialsName: "Mặt hàng khác",
+              PropertiesOfMaterialId: "MHK212",
+              PropertiesOfMaterialName: "Mặt hàng khác",
             },
           ];
           break;
@@ -274,6 +287,52 @@ export default {
             },
           ];
           break;
+        case "exprityType":
+          me.dataCombobox = [
+            {
+              ExprityType: 0,
+              ExprityTypeName: "Ngày",
+            },
+            {
+              ExprityType: 1,
+              ExprityTypeName: "Tháng",
+            },
+            {
+              ExprityType: 2,
+              ExprityTypeName: "Năm",
+            },
+          ];
+          break;
+        case "unit":
+          try {
+            await axios
+              .get(`${CONFIG.MY_URL}Units`)
+              .then((res) => {
+                me.dataCombobox = res.data.Data;
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } catch (error) {
+            console.log(error);
+          }
+
+          console.log(me.dataCombobox);
+          break;
+        case "stock":
+          try {
+            await axios
+              .get(`${CONFIG.MY_URL}Stocks`)
+              .then((res) => {
+                me.dataCombobox = res.data.Data;
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } catch (error) {
+            console.log(error);
+          }
+          break;
         default:
           break;
       }
@@ -287,7 +346,8 @@ export default {
       this.currentName = itemName;
       this.tempName = this.currentName;
       this.opened = false;
-      this.$emit("input", itemValue);
+
+      this.$emit("inputCombo", itemValue);
       this.$emit("comboboxOnSelect");
       this.isValid = true;
       this.isRequiredValid = true;
@@ -318,7 +378,9 @@ export default {
       let me = this;
       me.focusing = true;
       me.opened = true;
-      me.$emit("input", value);
+      if (this.fieldType != "pageSize") {
+        me.$emit("inputCombo", value);
+      }
       me.validateInput(value);
       me.filteredList(value);
     },

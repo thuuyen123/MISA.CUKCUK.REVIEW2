@@ -62,7 +62,7 @@ export default {
      * CreateBy: TTUyen (30/8/2021)
      */
     closePopup() {
-      this.$emit("close");
+      this.$emit("btnClose");
     },
 
     /**
@@ -70,7 +70,7 @@ export default {
      * CreateBy: TTUyen (30/8/2021)
      */
     cancelPopup() {
-      this.$emit("cancel");
+      this.$emit("btnCancel");
     },
 
     /**
@@ -78,7 +78,7 @@ export default {
      * CreateBy: TTUyen (30/8/2021)
      */
     confirmPopup() {
-      this.$emit("confirm");
+      this.$emit("btnConfirm");
     },
   },
 };

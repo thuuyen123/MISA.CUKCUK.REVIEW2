@@ -60,9 +60,9 @@
                         fieldType="properties"
                         displayName="Tính chất"
                         value=""
-                        itemId="PropertiesOfMaterialsId"
-                        itemName="PropertiesOfMaterialsName"
-                        v-if="item.fieldname == 'PropertiesOfMaterials'"
+                        itemId="PropertiesOfMaterialId"
+                        itemName="PropertiesOfMaterialName"
+                        v-if="item.fieldname == 'PropertiesOfMaterialName'"
                       />
                       <BaseCombobox
                         type="tableList"
@@ -111,6 +111,9 @@
               :key="'record' + index"
               :id="'record' + index"
               class="x-record-item"
+              @click="onClickChecked(index)"
+              @dblclick="btnEditOnClick(index)"
+              :class="{ 'x-record-item-selected': isChecked[index] }"
             >
               <td
                 v-for="(column, idx) in tableData.columns"
@@ -126,7 +129,9 @@
                     v-if="
                       column.fieldname == 'UnitConvert' ||
                       column.fieldname == 'ConvertRateOperate' ||
-                      column.fieldname == 'ConvertRate'">
+                      column.fieldname == 'ConvertRate'
+                    "
+                  >
                     <BaseCombobox
                       v-if="column.fieldname == 'UnitConvert'"
                       type="cbxform"
@@ -139,9 +144,9 @@
                       itemName="UnitName"
                       tabindex=""
                     />
-                   
+
                     <BaseInput
-                      v-if="column.fieldname=='ConvertRate'"
+                      v-if="column.fieldname == 'ConvertRate'"
                       ref="inputConvertRate"
                       id="txtConvertRate"
                       type="text"
@@ -151,7 +156,7 @@
                       placeholder=""
                       tabindex=""
                     />
-                     <BaseCombobox
+                    <BaseCombobox
                       v-if="column.fieldname == 'ConvertRateOperate'"
                       type="combo"
                       ref="inputConvertRateOperate"
@@ -162,7 +167,6 @@
                       itemId="MaterialUnitConvertId"
                       itemName="ConvertRateOperate"
                       tabindex=""
-                      
                     />
                   </div>
 
@@ -203,6 +207,8 @@
 
 import BaseInput from "./BaseInput.vue";
 import BaseCombobox from "./BaseCombobox.vue";
+import { FORM_STATE } from "../../js/common/enums";
+
 export default {
   // directives: {
   //   onClickaway: onClickaway,
@@ -221,13 +227,20 @@ export default {
       columns: {
         type: Array,
       },
-      indexOpen: -1,
+      name: String,
     },
+    isChecked: Array,
+
+    indexOpen: -1,
   },
+
+  created() {
+    this.isChecked[0] = true;
+  },
+
+  watch: {},
   data() {
     return {
-      checkAll: false,
-
       top: 0,
 
       openMenu: false,
@@ -235,6 +248,19 @@ export default {
   },
 
   methods: {
+    onClickChecked(value) {
+      this.$emit("changeSelectedTr", value, this.tableData.data[value]);
+      console.log(this.tableData.data[value]);
+    },
+
+    btnEditOnClick(value) {
+      this.$emit(
+        "btnEditOnDbClick",
+        false,
+        FORM_STATE.EDIT,
+        this.tableData.data[value]
+      );
+    },
     // away: function () {
     //   alert(1);
     //   this.openMenu = false;

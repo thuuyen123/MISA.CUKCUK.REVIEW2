@@ -42,7 +42,7 @@ export default {
     };
   },
   props: {
-    value: String,
+    value: String, Number,
     id: String,
     required: {
       type: Boolean,
