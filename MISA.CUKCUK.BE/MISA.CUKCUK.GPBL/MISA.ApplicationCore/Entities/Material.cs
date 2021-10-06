@@ -190,6 +190,7 @@ namespace MISA.ApplicationCore.Entities
         /// Created By : TTUyen (29/9/2021)
         [MISANotMap]
         public List<Material> MaterialDetails { get; set; }
+
         #endregion
 
     }

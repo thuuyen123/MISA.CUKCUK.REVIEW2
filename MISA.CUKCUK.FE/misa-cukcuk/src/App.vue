@@ -6,6 +6,7 @@
       <the-content />
     </div>
     <BaseLoading :showLoader="isShowLoadFull" />
+    
   </div>
 </template>
 <script>

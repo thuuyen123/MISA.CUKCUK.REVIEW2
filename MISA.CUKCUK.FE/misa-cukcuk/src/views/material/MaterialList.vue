@@ -65,7 +65,13 @@
         />
       </div>
     </div>
-    <MaterialDetail :status="recordStatus" />
+    <MaterialDetail
+      v-if="!recordStatus.isHide"
+      :status="recordStatus"
+      @close="detailOnClose()"
+      @reloadData="reloadData"
+      @changeState="changeStatusForm"
+    />
     <BasePopup
       v-if="!isHidePopupDelete"
       btn1="Có"
@@ -111,7 +117,7 @@ export default {
             id: "MaterialCodeHead",
             style: "min-width: 100px; max-width: 150px !important;  ",
             fieldname: "MaterialCode",
-            title: "Mã nhân viên",
+            title: "Mã nguyên vật liệu",
             typeFilter: "input",
             idType: "txtMaterialCode",
           },
@@ -212,13 +218,12 @@ export default {
 
   created() {
     this.loadDataTable();
-    setTimeout(() => {
-      this.idItemSelected = this.tableMaterial.data[0].MaterialId;
-      this.nameMaterial = this.tableMaterial.data[0].MaterialName;
-      this.dataMaterial = this.tableMaterial.data;
-    }, 150);
   },
   methods: {
+    detailOnClose() {
+      this.recordStatus.isHide = true;
+    },
+
     /**
      * Hàm load dữ liệu phân trang
      */
@@ -240,13 +245,17 @@ export default {
               me.tableMaterial.data = res.data.Data;
               me.totalPages = res.data.TotalPage;
               me.totalRecord = res.data.TotalRecord;
+              me.isChecked = new Array(me.tableMaterial.data.length).fill(
+                false
+              );
+              me.isChecked[0] = true;
+              me.idItemSelected = me.tableMaterial.data[0].MaterialId;
+              me.nameMaterial = me.tableMaterial.data[0].MaterialName;
+              me.dataMaterial = me.tableMaterial.data[0];
             } else {
               me.tableMaterial.data = [];
               me.totalRecord = 0;
               me.totalPages = 1;
-              me.isChecked = new Array(me.tableMaterial.data.length).fill(
-                false
-              );
             }
           })
           .catch(() => {
@@ -266,15 +275,12 @@ export default {
      * Hiển thị form dialog
      * CreateBy: TTUyen(02/10/2021)
      */
-    async changeStatusForm(isHide, formMode = FORM_STATE.ADD, data = []) {
-      this.recordStatus.isHide = false;
-      setTimeout(() => {
-        this.recordStatus = {
-          isHide: isHide,
-          formMode: formMode,
-          data: data,
-        };
-      }, 150);
+    changeStatusForm(isHide, formMode = FORM_STATE.ADD, data = []) {
+      this.recordStatus = {
+        isHide: isHide,
+        formMode: formMode,
+        data: data,
+      };
     },
     /**
      * Thay đổi item đã lựa chọn
@@ -402,8 +408,6 @@ export default {
     onHideLoaderFile() {
       eventBus.$emit("hideLoaderFull");
     },
-
- 
   },
 };
 </script>

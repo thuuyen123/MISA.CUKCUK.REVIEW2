@@ -25,7 +25,7 @@ namespace MISA.CukCuk.Api.Controllers
         /// </summary>
         /// <param name="baseService">base service</param>
         /// <param name="baseRepository">base repository</param>
-        ///Created By : TTUyen ( 28/08/2021)
+        ///Created By : TTUyen (31/09/2021)
         #region Contructor
         public BaseEntityController(IBaseService<TEntity> baseService, IBaseRepository<TEntity> baseRepository)
         {
@@ -40,7 +40,7 @@ namespace MISA.CukCuk.Api.Controllers
         /// Hiển thị danh sách 
         /// </summary>
         /// <returns>StatusCode</returns>
-        ///Created By : TTUyen ( 28/08/2021)
+        ///Created By : TTUyen (31/09/2021)
         [HttpGet]
         public IActionResult Get()
         {
@@ -72,7 +72,7 @@ namespace MISA.CukCuk.Api.Controllers
         /// </summary>
         /// <param name="entityId">Khóa chính bản ghi</param>
         /// <returns>StatusCode</returns>
-        /// Created By : TTUyen ( 28/08/2021)
+        /// Created By : TTUyen (31/09/2021)
         [HttpGet("{entityId}")]
         public IActionResult GetById(Guid entityId)
         {
@@ -113,7 +113,7 @@ namespace MISA.CukCuk.Api.Controllers
         /// </summary>
         /// <param name="entity">Object cần thêm</param>
         /// <returns>StatusCode</returns>
-        /// Created By : TTUyen (30/9/2021)
+        /// Created By : TTUyen (01/10/2021)
         [HttpPost]
         public IActionResult Insert(TEntity entity)
         {
@@ -158,7 +158,7 @@ namespace MISA.CukCuk.Api.Controllers
         /// </summary>
         /// <param name="entityId">Khóa chính bản ghi cần xóa</param>
         /// <returns></returns>
-        /// Created By : TTUyen (30/9/2021)
+        /// Created By : TTUyen (01/10/2021)
         [HttpDelete("{entityId}")]
         public IActionResult Delete(Guid entityId)
         {
@@ -207,7 +207,7 @@ namespace MISA.CukCuk.Api.Controllers
         /// <summary>
         /// Sửa bản ghi
         /// </summary>
-        /// Created By : TTUyen (30/9/2021)
+        /// Created By : TTUyen (01/10/2021)
         [HttpPut("{entityId}")]
         public IActionResult Update(TEntity entity, Guid entityId)
         {

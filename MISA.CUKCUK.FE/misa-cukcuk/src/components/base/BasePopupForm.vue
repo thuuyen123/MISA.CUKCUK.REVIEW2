@@ -1,14 +1,14 @@
 <template>
-  <div class="m-popup-form" :class="{ 'hide-form': !isShow }">
-    <div class="pop-form-container">
+  <div class="m-popup-form">
+    <div class="pop-form-container" :type="type">
       <div class="pop-form-header">
         <div class="title-form">{{ nameForm }}</div>
         <div class="tool-form">
-          <div class="tool-sprites x-tool-close"></div>
+          <div class="tool-sprites x-tool-close" @click="closePopup"></div>
         </div>
       </div>
       <div class="pop-form-content">
-        <div class="pop-form-detail" v-if="typeForm == 'unit'">
+        <div class="pop-form-detail" v-if="type == 'unit'">
           <BaseLabel title="" :required="true" label="Đơn vị tính">
             <BaseInput
               ref="inputUnitName"
@@ -19,28 +19,35 @@
               value=""
               placeholder=""
               :required="true"
-              tabindex="1"
+              tabindex="8"
+              :index="3"
+              @error="changeError"
             />
-            <div class="x-form-error" v-if="isError[0] == true">
+            <div class="x-form-error" v-if="isErrorForm[3] == true">
               <div class="sprite icon-form-invalid"></div>
             </div>
           </BaseLabel>
           <BaseLabel label="Diễn giải">
-            <textarea
-              ref="inputDescription"
-              id="txtDescription"
-              type="textare"
-              fieldType="description"
-              displayName="Diễn giải"
-              value=""
-              tabindex="7"
-              name=""
-              cols="30"
-              rows="10"
-            ></textarea>
+            <div class="field-textarea" tabindex="9">
+              <textarea
+                ref="inputDescription"
+                id="txtDescription"
+                type="textare"
+                fieldType="description"
+                displayName="Diễn giải"
+                value=""
+                name=""
+                cols="30"
+                rows="10"
+              ></textarea>
+            </div>
           </BaseLabel>
         </div>
-        <div class="pop-form-detail" v-if="typeForm == 'stock'">
+        <div
+          class="pop-form-detail"
+          title="Trường này không được để trống"
+          v-if="type == 'stock'"
+        >
           <BaseLabel title="" :required="true" label="Mã kho">
             <BaseInput
               ref="inputStockCode"
@@ -51,9 +58,15 @@
               value=""
               placeholder=""
               :required="true"
-              tabindex=""
+              tabindex="8"
+              :index="4"
+              @error="changeError"
             />
-            <div class="x-form-error" v-if="isError[0] == true">
+            <div
+              class="x-form-error"
+              title="Trường này không được để trống"
+              v-if="isErrorForm[4] == true"
+            >
               <div class="sprite icon-form-invalid"></div>
             </div>
           </BaseLabel>
@@ -67,25 +80,32 @@
               value=""
               placeholder=""
               :required="true"
-              tabindex=""
+              tabindex="9"
+              :index="5"
+              @error="changeError"
             />
-            <div class="x-form-error" v-if="isError[0] == true">
+            <div
+              class="x-form-error"
+              title="Trường này không được để trống"
+              v-if="isErrorForm[5] == true"
+            >
               <div class="sprite icon-form-invalid"></div>
             </div>
           </BaseLabel>
           <BaseLabel label="Diễn giải">
-            <textarea
-              ref="inputDescription"
-              id="txtDescription"
-              type="textare"
-              fieldType="description"
-              displayName="Diễn giải"
-              value=""
-              tabindex="7"
-              name=""
-              cols="30"
-              rows="10"
-            ></textarea>
+            <div class="field-textarea" tabindex="10">
+              <textarea
+                ref="inputDescription"
+                id="txtDescription"
+                type="textarea"
+                fieldType="description"
+                displayName="Diễn giải"
+                value=""
+                name=""
+                cols="30"
+                rows="10"
+              ></textarea>
+            </div>
           </BaseLabel>
         </div>
       </div>
@@ -112,6 +132,8 @@
 import BaseButton from "./BaseButton.vue";
 import BaseLabel from "./BaseLabel.vue";
 import BaseInput from "./BaseInput.vue";
+// import { eventBus } from "../../main.js";
+
 export default {
   components: {
     BaseButton,
@@ -129,7 +151,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    typeForm: {
+    type: {
       type: String,
       default: "1",
     },
@@ -139,33 +161,55 @@ export default {
         Description: "",
       },
     ],
+    isErrorForm: Array,
   },
-
+  mounted() {
+    this.focusFirstControl();
+  },
   watch: {
-    typeForm(value) {
+    type(value) {
       if (value == "unit") {
         this.nameForm = "Thêm Đơn vị tính";
       } else {
         this.nameForm = "Thêm Kho";
       }
     },
+    // isErrorForm(value){
+    //  for (let i = 0; i < value.length; i++) {
+    //    if(value[i] == true) this.$set(this.isErrorForm, i, true);
+    //    else{
+    //      this.$set(this.isErrorForm, i, false);
+    //    }
+    //  }
+    // }
   },
   data() {
     return {
-      isError: [false, false],
       nameForm: "Thêm Đơn vị tính",
     };
   },
-  created() {
-    // this.typeForm = "sds";
-  },
+  created() {},
   methods: {
+    /**
+     * Thực hiện focus khi mở form
+     */
+    focusFirstControl() {
+      if (this.$refs.inputUnitName) {
+        this.$refs.inputUnitName.focus();
+      }
+      if (this.$refs.inputStockCode) {
+        this.$refs.inputStockCode.focus();
+      }
+    },
     /**
      * Đóng popup
      * CreateBy: TTUyen (30/8/2021)
      */
     closePopup() {
       this.$emit("close");
+      this.$emit("errorForm", false, 3);
+      this.$emit("errorForm", false, 4);
+      this.$emit("errorForm", false, 5);
     },
 
     /**
@@ -183,12 +227,21 @@ export default {
     confirmPopup() {
       this.$emit("confirm");
     },
+
+    changeError(isShow, value) {
+      this.$emit("errorForm", isShow, value);
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
 @import "../../css/base/popup-form.css";
-.hide-form {
-  display: none;
+
+.pop-form-container[type="unit"] {
+  height: 170px;
+}
+
+.pop-form-container[type="stock"] {
+  height: 200px;
 }
 </style>

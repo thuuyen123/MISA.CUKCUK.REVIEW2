@@ -57,6 +57,11 @@ namespace MISA.ApplicationCore.Entities
   
     public enum EntityState
     {
+
+        /// <summary>
+        /// Không thực thi
+        /// </summary>
+        DEFAULT = 0,
         /// <summary>
         /// Thêm mơi
         /// </summary>

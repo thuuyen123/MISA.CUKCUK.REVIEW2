@@ -14,7 +14,7 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         /// Lấy tất cả dữ liệu
         /// </summary>
         /// <returns>Danh sách dữ liệu</returns>
-        /// CreateBy TTUyen (29/09/2021)
+        /// CreateBy TTUyen (03/10/2021)
         IEnumerable<TEntity> Get();
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         /// </summary>
         /// <param name="entity">Thực thể theo kiểu TEntity</param>
         /// <returns>Số bản ghi được thêm </returns>
-        /// CreateBy TTUyen (29/09/2021)
+        /// CreateBy TTUyen (03/10/2021)
         int Add(TEntity entity);
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         /// <param name="entity">Thực thể theo kiểu TEntity</param>
         /// <param name="entityId">Khóa chính của thực thể</param>
         /// <returns>Số bản ghi đã sửa</returns>
-        /// CreateBy TTUyen (29/09/2021)
+        /// CreateBy TTUyen (03/10/2021)
         int Update(TEntity entity, Guid entityId);
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         /// </summary>
         /// <param name="entityId">Id bản ghi</param>
         /// <returns>Số bản ghi đã xóa</returns>
-        /// CreateBy TTUyen (29/09/2021)
+        /// CreateBy TTUyen (03/10/2021)
         int Delete(Guid entityId);
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         /// </summary>
         /// <param name="entityId">Id bản ghi</param>
         /// <returns>Bản ghi có id tương ứng</returns>
-        /// CreateBy TTUyen (29/09/2021)
+        /// CreateBy TTUyen (03/10/2021)
         TEntity GetById(Guid entityId);
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         /// <param name="entity">Thực thể kiểu TEntity</param>
         /// <param name="property">Thuộc tính</param>
         /// <returns>Bản ghi tương ứng</returns>
-        /// CreateBy TTUyen (29/09/2021)
+        /// CreateBy TTUyen (03/10/2021)
         TEntity CheckDuplicateByProp(TEntity entity, PropertyInfo property);
         #endregion
     }

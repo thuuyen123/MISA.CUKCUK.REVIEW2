@@ -3,7 +3,7 @@
  * Thông điệp của popup
  * CreateBy: TTUyen (04/09/2021)
  */
- export const MESSAGE = {
+export const MESSAGE = {
 
     FORM_CHANGED: "Dữ liệu đã bị thay đổi. Bạn có muốn cất không?",
 
@@ -21,7 +21,7 @@
 
     INVALID_NUMBER: "{0} chỉ được phép chứa số",
 
-    ADD_MSG_SUCCESS: "Thêm nhân viên thành công!",
+    ADD_MSG_SUCCESS: "Thêm NVL thành công!",
 
     EDIT_MSG_SUCCESS: "Sửa thông tin thành công!",
 
@@ -35,5 +35,7 @@
 
     ERROR_DELETE_NOSUCCES: "Xóa không thành công",
 
-    RELOAD_SUCCESS: "Tải lại trang thành công"
+    RELOAD_SUCCESS: "Tải lại trang thành công",
+
+    DUBLICATE_UNIT: "Đơn vị chuyển đổi không được trùng với đơn vị tính chính.",
 }

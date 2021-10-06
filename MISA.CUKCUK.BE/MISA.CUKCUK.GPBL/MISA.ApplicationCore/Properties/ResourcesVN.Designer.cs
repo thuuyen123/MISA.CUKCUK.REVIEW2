@@ -133,7 +133,7 @@ namespace MISA.ApplicationCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mã  &lt;{0}&gt; bị trùng với mã của NVL &lt;{1}&gt; trong danh sách NVL..
+        ///   Looks up a localized string similar to Mã &lt;{0}&gt; bị trùng với mã của NVL &lt;{1}&gt; trong danh sách NVL..
         /// </summary>
         public static string ErrorUserMsgDuplicateMaterialCode {
             get {

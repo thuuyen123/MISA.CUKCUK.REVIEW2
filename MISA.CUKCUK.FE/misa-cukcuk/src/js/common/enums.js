@@ -8,6 +8,15 @@
     DELETE: "del",
     CLONE: "clone",
 }
+/**
+ * Trạng thái lưu
+ * CreateBy: TTUyen (07/09/2021)
+ */
+ export const ENTITY_STATE = {
+    ADD : 1,
+    EDIT: 2,
+    DELETE: 3,
+}
 
 /**
  * Trạng thái mã code

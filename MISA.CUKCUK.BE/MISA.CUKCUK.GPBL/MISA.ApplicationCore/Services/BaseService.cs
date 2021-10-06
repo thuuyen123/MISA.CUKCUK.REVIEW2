@@ -27,6 +27,7 @@ namespace MISA.ApplicationCore.Services
             _tagName = typeof(TEntity).Name;
         }
 
+        #region Method
         /// <summary>
         /// Thêm bản ghi
         /// </summary>
@@ -251,6 +252,7 @@ namespace MISA.ApplicationCore.Services
 
             return isValidated;
         }
+        #endregion
 
     }
 }

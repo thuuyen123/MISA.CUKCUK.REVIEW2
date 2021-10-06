@@ -45,13 +45,11 @@ namespace MISA.CUKCUK.API
             services.AddScoped<IMaterialService, MaterialService>();
             services.AddScoped<IStockService, StockService>();
             services.AddScoped<IUnitService, UnitService>();
-            services.AddScoped<IMaterialUnitConvertService, MaterialUnitConvertService>();
 
 
 
             services.AddScoped<IMaterialRepository, MaterialRepository>();
             services.AddScoped<IStockRepository, StockRepository>();
-            services.AddScoped<IMaterialUnitConvertRepository, MaterialUnitConvertRepository>();
             services.AddScoped<IUnitRepository, UnitRepository>();
 
             //DI

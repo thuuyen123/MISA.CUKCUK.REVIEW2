@@ -123,56 +123,96 @@
                 :class="column.subClass"
                 :title="record[column.fieldname]"
               >
-                <div>
+                <div v-if="tableData.name == 'tbUnitConvert'">
                   <div
+                    v-if="column.fieldname == 'Number'"
+                    class="text-value-column"
+                  >
+                    <span> {{ index + 1 }} </span>
+                  </div>
+                  <div
+                    v-else-if="column.fieldname == 'UnitConvertId'"
                     class="cbx-value-column"
-                    v-if="
-                      column.fieldname == 'UnitConvert' ||
-                      column.fieldname == 'ConvertRateOperate' ||
-                      column.fieldname == 'ConvertRate'
-                    "
                   >
                     <BaseCombobox
-                      v-if="column.fieldname == 'UnitConvert'"
                       type="cbxform"
                       ref="inputUnit"
                       id="txtUnit"
-                      fieldType="Unit"
+                      fieldType="unitConvert"
                       displayName="Đơn vị tính"
-                      value=""
                       itemId="UnitId"
                       itemName="UnitName"
                       tabindex=""
+                      styleList="max-height: 98px; overflow: auto;"
+                      @btnShowFormAdd="btnShowFormAdd('unit')"
+                      @inputCombo="unitConvertChange(index, $event)"
+                      :data="dataUnit"
+                      :value="record['UnitConvertId']"
+                      :selectedId="record['UnitConvertId']"
                     />
-
-                    <BaseInput
-                      v-if="column.fieldname == 'ConvertRate'"
-                      ref="inputConvertRate"
-                      id="txtConvertRate"
-                      type="text"
-                      fieldType="ConvertRate"
-                      displayName="Tỷ lệ chuyển đổi"
-                      value=""
-                      placeholder=""
-                      tabindex=""
-                    />
+                  </div>
+                  <div v-else-if="column.fieldname == 'ConvertRateOperate'">
                     <BaseCombobox
-                      v-if="column.fieldname == 'ConvertRateOperate'"
                       type="combo"
                       ref="inputConvertRateOperate"
                       id="txtConvertRateOperate"
-                      fieldType="ConvertRateOperate"
+                      fieldType="convertRateOperate"
                       displayName="Phép tính"
                       value=""
-                      itemId="MaterialUnitConvertId"
-                      itemName="ConvertRateOperate"
+                      :selectedId="record[column.fieldname]"
+                      itemId="ConvertRateOperate"
+                      itemName="ConvertRateOperateName"
                       tabindex=""
+                      v-model="record['ConvertRateOperate']"
+                      @inputCombo="convertRateOperateChange(index, $event)"
                     />
                   </div>
+                  <!-- 
+                  <BaseInput
+                    v-if="column.fieldname == 'ConvertRate'"
+                    ref="inputConvertRate"
+                    id="txtConvertRate"
+                    type="text"
+                    fieldType="convertRate"
+                    displayName="Tỷ lệ chuyển đổi"
+                    value=""
+                    placeholder=""
+                    tabindex=""
+                  /> -->
+                  <div v-else-if="column.fieldname == 'ConvertRate'">
+                    <div
+                      title="Tỷ lệ chuyển đổi"
+                      tabindex=""
+                      class="field-input"
+                    >
+                      <!-- <input
+                      ref="inputConvertRate"
+                      type="text"
+                      class="form-input-item"
+                      value="0"
+                      fieldType="convertRate"
+                      id="txtConvertRate"
+                    /> -->
+                      <money
+                        ref="inputConvertRate"
+                        type="text"
+                        class="form-input-item"
+                        value="0"
+                        style="text-align: right"
+                        v-bind="money"
+                        v-model="record['ConvertRate']"
+                      ></money>
+                    </div>
+                  </div>
 
+                  <div v-else class="text-value-column">
+                    <span> {{ record[column.fieldname] }} </span>
+                  </div>
+                </div>
+                <div v-else>
                   <div
                     class="text-value-column"
-                    v-else-if="column.fieldname != 'StopUsing'"
+                    v-if="column.fieldname != 'StopUsing'"
                   >
                     <span>{{ record[column.fieldname] }}</span>
                   </div>
@@ -205,18 +245,21 @@
 // import { FORM_STATE } from "../../js/common/enums";
 // import { directive as onClickaway } from "vue-clickaway";
 
-import BaseInput from "./BaseInput.vue";
+// import BaseInput from "./BaseInput.vue";
 import BaseCombobox from "./BaseCombobox.vue";
 import { FORM_STATE } from "../../js/common/enums";
-
+import axios from "axios";
+import { CONFIG } from "../../js/common/config";
+import { Money } from "v-money";
 export default {
   // directives: {
   //   onClickaway: onClickaway,
   // },
   name: "BaseTable",
   components: {
-    BaseInput,
+    // BaseInput,
     BaseCombobox,
+    Money,
   },
 
   props: {
@@ -236,21 +279,36 @@ export default {
 
   created() {
     this.isChecked[0] = true;
+    this.loadUnit();
   },
 
-  watch: {},
   data() {
     return {
       top: 0,
 
       openMenu: false,
+
+      dataUnit: [],
+
+      money: {
+        decimal: ",",
+        thousands: ".",
+        precision: 2,
+        masked: false,
+      },
     };
   },
 
   methods: {
+    unitConvertChange(index, unit) {
+      this.$emit("unitChange", { index, unit });
+    },
+
+    convertRateOperateChange(index, rate) {
+      this.$emit("rateChange", { index, rate });
+    },
     onClickChecked(value) {
       this.$emit("changeSelectedTr", value, this.tableData.data[value]);
-      console.log(this.tableData.data[value]);
     },
 
     btnEditOnClick(value) {
@@ -290,6 +348,28 @@ export default {
       } else {
         this.openMenu = false;
         this.$refs[`filter${index}`][0].style.display = "none";
+      }
+    },
+
+    btnShowFormAdd(value) {
+      this.$emit("btnShowFormAdd", value);
+    },
+
+    /**
+     * Lấy dữ liệu cho đơn vị tính
+     */
+    async loadUnit() {
+      try {
+        await axios
+          .get(`${CONFIG.MY_URL}Units`)
+          .then((res) => {
+            this.dataUnit = res.data.Data;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (error) {
+        console.log(error);
       }
     },
     /**

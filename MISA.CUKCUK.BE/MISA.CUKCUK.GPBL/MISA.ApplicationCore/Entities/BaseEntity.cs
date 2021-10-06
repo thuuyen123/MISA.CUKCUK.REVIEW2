@@ -12,7 +12,8 @@ namespace MISA.ApplicationCore.Entities
         #region Property
   
         [MISANotMap]
-        public EntityState EntityState { get; set; } = EntityState.AddNew;
+        [DisplayName("Trạng thái")]
+        public EntityState EntityState { get; set; } = EntityState.DEFAULT;
         /// <summary>
         /// Ngày tạo
         /// </summary>

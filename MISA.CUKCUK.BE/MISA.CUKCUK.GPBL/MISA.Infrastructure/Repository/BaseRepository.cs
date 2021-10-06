@@ -53,7 +53,7 @@ namespace MISA.Infrastructor.Repository
         /// <param name="entity">Bản ghi cần thêm</param>
         /// <returns>Trả về số bản ghi được thêm</returns>
         /// CreateBy: TTUyen
-        public virtual int Add(TEntity entity)
+        public int Add(TEntity entity)
         {
             try
             {
@@ -198,7 +198,7 @@ namespace MISA.Infrastructor.Repository
         /// <param name="entity"></param>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        public virtual int Update(TEntity entity, Guid entityId)
+        public int Update(TEntity entity, Guid entityId)
         {
             var rowEffects = 0;
 

@@ -142,7 +142,7 @@
     <value>{0} &lt;{1}&gt; đã tồn tại.</value>
   </data>
   <data name="ErrorUserMsgDuplicateMaterialCode" xml:space="preserve">
-    <value>Mã  &lt;{0}&gt; bị trùng với mã của NVL &lt;{1}&gt; trong danh sách NVL.</value>
+    <value>Mã &lt;{0}&gt; bị trùng với mã của NVL &lt;{1}&gt; trong danh sách NVL.</value>
   </data>
   <data name="ErrorUserMsgExeption" xml:space="preserve">
     <value>Có lỗi xảy ra! Vui lòng liên hệ với MISA!</value>

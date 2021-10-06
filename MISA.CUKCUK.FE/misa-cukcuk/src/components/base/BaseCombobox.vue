@@ -12,18 +12,19 @@
       :type="type"
     >
       <input
+        ref="input"
         type="text"
         class="combobox-value"
         v-model="currentName"
         @input="onInput($event.target.value)"
         @blur="onBlur($event.target.value)"
-        :tabindex="tabindex"
+        @focus="onFocus"
         @keydown.down="moveDown"
         @keydown.up="moveUp"
         @keydown.tab="onTabOut"
         @keydown.enter="onItemSelect(currentFocus)"
+        :index="index"
       />
-
       <div class="form-control">
         <div
           class="combobox-open"
@@ -39,6 +40,16 @@
           <div class="cbx-icon sprite icon-form-add-trigger"></div>
         </div>
       </div>
+    </div>
+    <div
+      class="hide-combo"
+      :class="{ 'hide-div': showCombo }"
+      v-if="fieldType == 'convertRateOperate' || fieldType == 'unitConvert'"
+      @click="changShowCombo"
+    >
+      <span v-if="currentName == '* - nhân'">*</span>
+      <span v-if="currentName == '/ - chia'">/</span>
+      <span v-if="fieldType == 'unitConvert'">{{ currentName }}</span>
     </div>
     <ul
       :class="['combobox-list', opened ? 'isshow' : 'isnone']"
@@ -72,8 +83,6 @@
 // import axios from "axios";
 import { directive as onClickaway } from "vue-clickaway";
 import { MESSAGE } from "../../js/common/const";
-import axios from "axios";
-import { CONFIG } from "../../js/common/config";
 export default {
   directives: {
     onClickaway: onClickaway,
@@ -85,9 +94,9 @@ export default {
     itemId: String,
     itemName: String,
     itemCode: String,
-    selectedId: String,
+    selectedId: [String, Number],
     tabindex: String,
-    value: String,
+    value: [String, Number],
     required: {
       type: Boolean,
       default: false,
@@ -98,6 +107,9 @@ export default {
     },
     fieldType: String,
     styleList: String,
+    index: Number,
+
+    data: Array,
   },
   created() {
     this.loadDataCombobox();
@@ -132,6 +144,8 @@ export default {
       dataCombobox: [],
 
       tempName: "",
+
+      showCombo: false,
     };
   },
   watch: {
@@ -144,6 +158,18 @@ export default {
     },
   },
   methods: {
+    /**
+     * Hàm focus
+     */
+    focus() {
+      if (this.$refs.input) {
+        this.$refs.input.focus();
+      }
+    },
+
+    /**
+     * Hiển thị form thêm mới đơn vị tính, kho ngầm định
+     */
     btnShowFormAdd() {
       this.$emit("btnShowFormAdd", this.fieldType);
     },
@@ -153,15 +179,27 @@ export default {
      */
     away: function () {
       this.opened = false;
+      this.showCombo = false;
       this.currentName = this.tempName;
     },
 
+    /**
+     * Thực hiện khi focus vào 
+     */
+    onFocus() {
+      this.showCombo = true;
+    },
     /**
      * Hàm đóng list combobx
      * CreateBy: TTUyen (30/8/2021)
      */
     toggleItems() {
       this.opened = !this.opened;
+      this.showCombo = !this.showCombo;
+    },
+
+    changShowCombo() {
+      this.showCombo = true;
     },
     /**
      * Lọc dữ liệu
@@ -169,7 +207,6 @@ export default {
      */
     filteredList(searchText) {
       this.loadDataCombobox();
-      console.log(this.dataCombobox);
       if (searchText == null || searchText == "") {
         this.itemList = this.dataCombobox;
       } else {
@@ -191,7 +228,8 @@ export default {
         if (
           me.fieldType != "language" &&
           me.fieldType != "branch" &&
-          me.fieldType != "pageSize"
+          me.fieldType != "pageSize" &&
+          me.fieldType != "exprityType"
         ) {
           if ((me.selectedId + "").length > 0) {
             me.dataCombobox.forEach((item) => {
@@ -303,37 +341,20 @@ export default {
             },
           ];
           break;
-        case "unit":
-          try {
-            await axios
-              .get(`${CONFIG.MY_URL}Units`)
-              .then((res) => {
-                me.dataCombobox = res.data.Data;
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          } catch (error) {
-            console.log(error);
-          }
-
-          console.log(me.dataCombobox);
-          break;
-        case "stock":
-          try {
-            await axios
-              .get(`${CONFIG.MY_URL}Stocks`)
-              .then((res) => {
-                me.dataCombobox = res.data.Data;
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          } catch (error) {
-            console.log(error);
-          }
+        case "convertRateOperate":
+          me.dataCombobox = [
+            {
+              ConvertRateOperate: "*",
+              ConvertRateOperateName: "* - nhân",
+            },
+            {
+              ConvertRateOperate: "/",
+              ConvertRateOperateName: "/ - chia",
+            },
+          ];
           break;
         default:
+          me.dataCombobox = JSON.parse(JSON.stringify(me.data));
           break;
       }
     },
@@ -346,8 +367,9 @@ export default {
       this.currentName = itemName;
       this.tempName = this.currentName;
       this.opened = false;
-
+      this.showCombo = false;
       this.$emit("inputCombo", itemValue);
+      this.$emit("changeValueCombo", itemValue, this.itemId);
       this.$emit("comboboxOnSelect");
       this.isValid = true;
       this.isRequiredValid = true;
@@ -359,6 +381,7 @@ export default {
      */
     onTabOut() {
       this.opened = false;
+      this.showCombo = false;
     },
 
     /**
@@ -389,29 +412,24 @@ export default {
      * CreateBy: TTUyen (30/8/2021)
      */
     validateInput(value) {
-      try {
-        let me = this;
-        //Kiểm tra nhập các trường bắt buộc
-        if (!me.required && value == "") {
-          me.isValid = true;
-          me.isRequiredValid = true;
-          return;
-        }
+      let me = this;
+      let valid = true;
+       me.focusing = false;
 
-        //Rỗng và bắt buộc
-        if (value == "" && me.required) {
-          me.isRequiredValid = false;
-          me.tooltip = MESSAGE.CANT_BE_NULL.format(me.displayName);
-          return;
-        } else {
-          me.isRequiredValid = true;
+      if (me.required) {
+        if (value === "" || value === undefined || value === null) {
+          valid = false;
         }
-        if (me.isRequiredValid && me.isValid) {
-          me.tooltip = "";
-        }
-      } catch (error) {
-        console.log(error);
       }
+      if (valid) {
+        me.isRequiredValid = true;
+        me.$emit("error", false, me.index);
+      } else {
+        me.isRequiredValid = false;
+        me.tooltip = MESSAGE.CANT_BE_NULL.format(me.displayName);
+        me.$emit("error", true, me.index);
+      }
+      return valid;
     },
     /**
      * Chọn item khi click enter
@@ -429,10 +447,10 @@ export default {
         let itemId = this.itemList[index][this.itemId];
         console.log(itemId);
         let itemName = this.itemList[index][this.itemName];
-
         this.clickItem(itemId, itemName);
       }
       this.opened = false;
+      this.showCombo = false;
     },
 
     /**
@@ -446,6 +464,7 @@ export default {
       }
       if (this.currentFocus < 0) {
         this.opened = false;
+        this.showCombo = false;
       }
     },
 
@@ -473,4 +492,18 @@ export default {
 </script>
 <style scoped>
 @import "../../css/base/combobox.css";
+.hide-combo {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  background-color: #fff;
+  right: 0;
+  padding: 3px 5px;
+  border: 1px solid transparent;
+}
+
+.hide-div {
+  display: none;
+}
 </style>

@@ -1,14 +1,10 @@
 <template>
-  <div
-    class="field-input"
-    :class="{
-      'input-border-red': false,
-    }"
-    :id="id"
-    :title="tooltip"
-  >
+  <div class="field-input" :id="id" :title="tooltip" :tabindex="tabindex">
     <!-- !(isRequiredValid && isValid) && !focusing -->
     <input
+      :class="{
+        'input-border-red': !(isRequiredValid && isValid) && !focusing,
+      }"
       ref="input"
       :value="value"
       @input="onInput($event.target.value)"
@@ -42,7 +38,9 @@ export default {
     };
   },
   props: {
-    value: String, Number,
+    value: {
+      type: [String, Number],
+    },
     id: String,
     required: {
       type: Boolean,
@@ -55,9 +53,24 @@ export default {
       type: String,
       default: "",
     },
+    index: Number,
+    tabindex: String,
+  },
+  created() {
+    this.setDefault();
   },
   watch: {},
   methods: {
+    setDefault() {
+      if (this.fieldType == "convertRate") {
+        this.value = 0;
+      }
+    },
+    focus() {
+      if (this.$refs.input) {
+        this.$refs.input.focus();
+      }
+    },
     /**
      * Hàm focus
      * CreateBy: TTUyen (30/8/2021)
@@ -81,6 +94,7 @@ export default {
       let me = this;
       me.$emit("input", value);
       me.validateInput(value);
+      me.sendNewCode(value);
     },
 
     /**
@@ -91,6 +105,7 @@ export default {
       this.focusing = false;
       let me = this;
       me.validateInput(value);
+      me.sendNewCode(value);
     },
 
     /**
@@ -99,30 +114,32 @@ export default {
      */
     validateInput(value) {
       let me = this;
-      //Kiểm tra nhập các trường bắt buộc
-      if (!me.required && value == "") {
-        me.isValid = true;
-        me.isRequiredValid = true;
-        return;
+      let valid = true;
+      me.focusing = false;
+      if (me.required) {
+        if (value === "" || value === undefined || value === null) {
+          valid = false;
+        }
       }
-
-      //Rỗng và bắt buộc
-      if (value == "" && me.required) {
+      if (valid) {
+        me.isRequiredValid = true;
+        me.$emit("error", false, me.index);
+      } else {
         me.isRequiredValid = false;
         me.tooltip = MESSAGE.CANT_BE_NULL.format(me.displayName);
-        return;
-      } else {
-        me.isRequiredValid = true;
+        me.$emit("error", true, me.index);
       }
+      return valid;
+    },
 
-      // switch (me.fieldType) {
-      //   case "email":
-      //     me.isValid = CommonFn.isEmail(value);
-      //     me.tooltip = me.isValid ? "" : MESSAGE.INVALID_EMAIL;
-      //     break;
-      // }
-      if (me.isRequiredValid && me.isValid) {
-        me.tooltip = "";
+    /**
+     * Gửi yc sinh mã mớ
+     */
+    sendNewCode(value) {
+      if (this.fieldType == "materialName") {
+        setTimeout(() => {
+          this.$emit("handleNewCode", value);
+        }, 500);
       }
     },
   },
