@@ -16,29 +16,29 @@
         <div>
           <BaseButton
             type="control"
-            id="pop-3"
-            :tabindex="2"
-            @btn-click="cancelPopup"
-          >
-            {{ $attrs.btn3 }}
-          </BaseButton>
-          <BaseButton
-            type="control"
             @btn-click="confirmPopup"
             id="pop-1"
             :tabindex="3"
           >
             {{ $attrs.btn1 }}
           </BaseButton>
+          <BaseButton
+            type="control"
+            @btn-click="closePopup"
+            id="pop-2"
+            :tabindex="1"
+          >
+            {{ $attrs.btn2 }}
+          </BaseButton>
+          <BaseButton
+            type="control"
+            id="pop-3"
+            :tabindex="2"
+            @btn-click="cancelPopup"
+          >
+            {{ $attrs.btn3 }}
+          </BaseButton>
         </div>
-        <BaseButton
-          type="control"
-          @btn-click="closePopup"
-          id="pop-2"
-          :tabindex="1"
-        >
-          {{ $attrs.btn2 }}
-        </BaseButton>
       </div>
     </div>
   </div>
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     /**
-     * Đóng popup
+     * Đóng popup (không)
      * CreateBy: TTUyen (30/8/2021)
      */
     closePopup() {

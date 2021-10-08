@@ -4,12 +4,12 @@
       <div class="pop-form-header">
         <div class="title-form">{{ nameForm }}</div>
         <div class="tool-form">
-          <div class="tool-sprites x-tool-close" @click="closePopup"></div>
+          <div class="tool-sprites x-tool-close" @click="closeOnChange"></div>
         </div>
       </div>
       <div class="pop-form-content">
         <div class="pop-form-detail" v-if="type == 'unit'">
-          <BaseLabel title="" :required="true" label="Đơn vị tính">
+          <BaseLabel title="" label="Đơn vị tính">
             <BaseInput
               ref="inputUnitName"
               id="txtUnitName"
@@ -19,16 +19,19 @@
               value=""
               placeholder=""
               :required="true"
-              tabindex="8"
+              tabindex="14"
               :index="3"
-              @error="changeError"
+              v-model="unitDetail.UnitName"
+              @error="arrayError"
             />
+            <!-- @error="changeError" -->
             <div class="x-form-error" v-if="isErrorForm[3] == true">
               <div class="sprite icon-form-invalid"></div>
             </div>
           </BaseLabel>
+
           <BaseLabel label="Diễn giải">
-            <div class="field-textarea" tabindex="9">
+            <div class="field-textarea">
               <textarea
                 ref="inputDescription"
                 id="txtDescription"
@@ -39,6 +42,8 @@
                 name=""
                 cols="30"
                 rows="10"
+                tabindex="15"
+                v-model="unitDetail.Description"
               ></textarea>
             </div>
           </BaseLabel>
@@ -58,9 +63,10 @@
               value=""
               placeholder=""
               :required="true"
-              tabindex="8"
+              tabindex="14"
               :index="4"
-              @error="changeError"
+              @error="arrayError"
+              v-model="stockDetail.StockCode"
             />
             <div
               class="x-form-error"
@@ -77,12 +83,12 @@
               type="text"
               fieldType="StockName"
               displayName="Tên kho"
-              value=""
+              v-model="stockDetail.StockName"
               placeholder=""
               :required="true"
-              tabindex="9"
+              tabindex="15"
               :index="5"
-              @error="changeError"
+              @error="arrayError"
             />
             <div
               class="x-form-error"
@@ -100,10 +106,11 @@
                 type="textarea"
                 fieldType="description"
                 displayName="Diễn giải"
-                value=""
                 name=""
                 cols="30"
                 rows="10"
+                tabindex="16"
+                v-model="stockDetail.Description"
               ></textarea>
             </div>
           </BaseLabel>
@@ -117,7 +124,11 @@
           </BaseButton>
         </div>
         <div class="btn-footer-form">
-          <BaseButton type="default" iconClass="sprite icon-btnSave">
+          <BaseButton
+            type="default"
+            iconClass="sprite icon-btnSave"
+            @btn-click="btnSaveForm"
+          >
             Cất
           </BaseButton>
           <BaseButton type="default" iconClass="sprite icon-btnCancel-red">
@@ -132,7 +143,10 @@
 import BaseButton from "./BaseButton.vue";
 import BaseLabel from "./BaseLabel.vue";
 import BaseInput from "./BaseInput.vue";
-// import { eventBus } from "../../main.js";
+import { MESSAGE } from "../../js/common/const";
+import { STATUS_CODE } from "../../js/common/enums";
+import axios from "axios";
+import { CONFIG } from "../../js/common/config";
 
 export default {
   components: {
@@ -155,13 +169,12 @@ export default {
       type: String,
       default: "1",
     },
-    unitDetail: [
-      {
-        UnitName: "",
-        Description: "",
-      },
-    ],
-    isErrorForm: Array,
+    
+    isConfirm: {
+      type: Boolean,
+      default: false,
+    }
+    //isErrorForm: Array,
   },
   mounted() {
     this.focusFirstControl();
@@ -174,22 +187,132 @@ export default {
         this.nameForm = "Thêm Kho";
       }
     },
-    // isErrorForm(value){
-    //  for (let i = 0; i < value.length; i++) {
-    //    if(value[i] == true) this.$set(this.isErrorForm, i, true);
-    //    else{
-    //      this.$set(this.isErrorForm, i, false);
-    //    }
-    //  }
-    // }
+    isConfirm(value){
+      alert(1);
+      if(value == true){
+        this.btnSaveForm();
+        this.$emit("resetIsConfirm");
+      }
+      
+    }
   },
   data() {
     return {
       nameForm: "Thêm Đơn vị tính",
+
+      originalUnitForm: {
+        UnitName: "",
+        Description: "",
+      },
+
+      originalStockForm: {
+        StockCode: "",
+        StockName: "",
+        Description: "",
+      },
+
+      unitDetail: { UnitName: "", Description: "" },
+
+      stockDetail: { StockCode: "", StockName: "", Description: "" },
+
+      invalidRef: [],
+
+      isErrorForm: [],
     };
   },
   created() {},
   methods: {
+    /**
+     * Hàm thực hiện lưu dữ liệu
+     */
+    btnSaveForm() {
+      this.invalidRef = [];
+      Object.values(this.$refs).forEach((el) => {
+        if (typeof el.validateInput === "function") {
+          let valid = el.validateInput(el.value);
+          if (el.value == null || el.value == "") {
+            valid = el.validateInput(el.$el.querySelector("input").value);
+          }
+          if (valid === false) {
+            this.invalidRef.push(el);
+          }
+        }
+      });
+
+      //Kiểm tra những input không hợp lệ
+
+      if (this.invalidRef.length > 0) {
+        if (typeof this.invalidRef[0].focus === "function") {
+          this.invalidRef[0].focus();
+        }
+        return false;
+      } else {
+        return this.sendDetails();
+      }
+    },
+
+    /**
+     * Hàm thực hiện lưu dữ liệu vào database
+     * CreateBy: TTUyen(01/09/2021)
+     */
+
+    async sendDetails() {
+      try {
+        switch (this.type) {
+          case "unit":
+            await axios
+              .post(CONFIG.MY_URL + "Units/", this.unitDetail)
+              .then((res) => {
+                if (res.status != STATUS_CODE.NO_CONTENT) {
+                  this.$toast.success(MESSAGE.ADD_MSG_SUCCESS, {
+                    position: "bottom-right",
+                    timeout: 2000,
+                  });
+                  this.$emit("reloadDataUnitAndStock");
+                  this.$emit("closePopForm");
+                }
+              })
+              .catch((res) => {
+                this.$emit(
+                  "showPopupWarningServer",
+                  res.response.data.Data.userMsg[0]
+                );
+              });
+            break;
+          case "stock":
+            await axios
+              .post(CONFIG.MY_URL + "Stocks/", this.stockDetail)
+              .then((res) => {
+                console.log(res.data);
+                if (res.status != STATUS_CODE.NO_CONTENT) {
+                  this.$toast.success(MESSAGE.ADD_MSG_SUCCESS, {
+                    position: "bottom-right",
+                    timeout: 2000,
+                  });
+                  this.$emit("reloadDataUnitAndStock");
+                  this.$emit("closePopForm");
+                }
+              })
+              .catch((res) => {
+                this.$emit(
+                  "showPopupWarningServer",
+                  res.response.data.Data.userMsg[0]
+                );
+              });
+            break;
+          default:
+            break;
+        }
+      } catch (err) {
+        console.log(err);
+        this.$toast.error(MESSAGE.EXCEPTION_MSG, {
+          position: "bottom-right",
+          timeout: 2000,
+        });
+      }
+      this.$emit("reloadDataUnitAndStock");
+    },
+
     /**
      * Thực hiện focus khi mở form
      */
@@ -201,15 +324,40 @@ export default {
         this.$refs.inputStockCode.focus();
       }
     },
+
+    checkChangeForm(original, present) {
+      let isChange = false;
+      Object.entries(original).forEach(([key]) => {
+        if (original[key] !== present[key]) {
+          isChange = true;
+        }
+      });
+      if (isChange) {
+        this.$emit("saveChangesPopupShow", "form");
+      } else {
+        this.closePopForm();
+      }
+    },
+    /**
+     * Kiểm tra thay đổi trc khi đóng form
+     */
+    closeOnChange() {
+      if (this.type == "unit") {
+        this.checkChangeForm(this.originalUnitForm, this.unitDetail);
+      }
+      if (this.type == "stock") {
+        this.checkChangeForm(this.originalStockForm, this.stockDetail);
+      }
+    },
     /**
      * Đóng popup
      * CreateBy: TTUyen (30/8/2021)
      */
-    closePopup() {
-      this.$emit("close");
-      this.$emit("errorForm", false, 3);
-      this.$emit("errorForm", false, 4);
-      this.$emit("errorForm", false, 5);
+    closePopForm() {
+      this.$emit("closePopForm");
+      // this.$emit("errorForm", false, 3);
+      // this.$emit("errorForm", false, 4);
+      // this.$emit("errorForm", false, 5);
     },
 
     /**
@@ -228,8 +376,24 @@ export default {
       this.$emit("confirm");
     },
 
-    changeError(isShow, value) {
-      this.$emit("errorForm", isShow, value);
+    // /**
+    //  * Hàm gửi emit hiển thị cảnh báo khi validate
+    //  */
+    // changeError(isShow, value) {
+    //   this.$emit("errorForm", isShow, value);
+    // },
+
+    /**
+     * Hiển thị lỗi chưa validate dữ liệu
+     * CreateBy: TTUyen(05/10/2021)
+     */
+
+    arrayError(isShow, value) {
+      if (isShow == true) {
+        this.$set(this.isErrorForm, value, true);
+      } else {
+        this.$set(this.isErrorForm, value, false);
+      }
     },
   },
 };

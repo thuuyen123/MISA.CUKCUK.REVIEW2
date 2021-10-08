@@ -8,7 +8,6 @@
       }"
       :id="id"
       :title="tooltip"
-      :tabindex="tabindex"
       :type="type"
     >
       <input
@@ -24,6 +23,7 @@
         @keydown.tab="onTabOut"
         @keydown.enter="onItemSelect(currentFocus)"
         :index="index"
+        :tabindex="tabindex"
       />
       <div class="form-control">
         <div
@@ -149,6 +149,13 @@ export default {
     };
   },
   watch: {
+    data() {
+      this.loadDataCombobox();
+      setTimeout(() => {
+        this.initChoice();
+        this.filteredList("");
+      }, 150);
+    },
     /**
      * Xử lý khi thay đổi lựa chọn
      *  CreateBy: TTUyen (30/8/2021)
@@ -184,7 +191,7 @@ export default {
     },
 
     /**
-     * Thực hiện khi focus vào 
+     * Thực hiện khi focus vào
      */
     onFocus() {
       this.showCombo = true;
@@ -228,8 +235,7 @@ export default {
         if (
           me.fieldType != "language" &&
           me.fieldType != "branch" &&
-          me.fieldType != "pageSize" &&
-          me.fieldType != "exprityType"
+          me.fieldType != "pageSize"
         ) {
           if ((me.selectedId + "").length > 0) {
             me.dataCombobox.forEach((item) => {
@@ -414,7 +420,7 @@ export default {
     validateInput(value) {
       let me = this;
       let valid = true;
-       me.focusing = false;
+      me.focusing = false;
 
       if (me.required) {
         if (value === "" || value === undefined || value === null) {

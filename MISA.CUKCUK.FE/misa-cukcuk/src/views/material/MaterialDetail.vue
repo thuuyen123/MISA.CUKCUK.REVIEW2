@@ -3,7 +3,7 @@
     <div class="m-model">
       <div class="dialog-container">
         <div class="dialog-form-header">
-          <div class="title-dialog">Thêm Nguyên vật liệu</div>
+          <div class="title-dialog">{{ nameForm }}</div>
           <div class="tool-form">
             <div class="tool-sprites icon-tool-zoom"></div>
             <div
@@ -22,19 +22,17 @@
                   type="text"
                   fieldType="materialName"
                   displayName="Tên"
-                  value=""
-                  placeholder=""
                   :required="true"
                   v-model="materialDetail.MaterialName"
                   tabindex="1"
                   :index="0"
                   @error="arrayError"
                   @handleNewCode="handleNewCode"
+                  :maxLenght="128"
                 />
                 <div
                   class="x-form-error"
                   :class="{ 'hide-form-error': !(isError[0] == true) }"
-                  title="Tên không được phép để trống"
                 >
                   <div class="sprite icon-form-invalid"></div>
                 </div>
@@ -47,7 +45,6 @@
                     id="txtUnit"
                     fieldType="unit"
                     displayName="Đơn vị tính"
-                    value=""
                     itemId="UnitId"
                     itemName="UnitName"
                     :required="true"
@@ -63,7 +60,6 @@
                   <div
                     class="x-form-error"
                     :class="{ 'hide-form-error': !(isError[1] == true) }"
-                    title="Đơn vị tính không được phép để trống"
                   >
                     <div class="sprite icon-form-invalid"></div>
                   </div>
@@ -74,14 +70,12 @@
                   <BaseInput
                     ref="inputExprityDate"
                     id="txtExprityDate"
-                    type="num"
+                    type="number"
                     fieldType="exprityDate"
                     displayName="Hạn sử dụng"
-                    value=""
-                    placeholder=""
-                    tabindex="4"
-                    :required="false"
+                    tabindex="5"
                     v-model="materialDetail.ExprityDate"
+                    :maxLenght="15"
                   />
                   <BaseCombobox
                     type="combo"
@@ -89,13 +83,12 @@
                     id="txtExprityType"
                     fieldType="exprityType"
                     displayName="Kiểu hạn sử dụng"
-                    value=""
                     itemId="ExprityType"
                     itemName="ExprityTypeName"
-                    tabindex="5"
-                    :required="false"
+                    tabindex="6"
                     :selectedId="materialDetail.ExprityType"
                     v-model="materialDetail.ExprityType"
+                    @changeValueCombo="updateValueCombobox"
                   />
                 </div>
               </BaseLabel>
@@ -108,13 +101,12 @@
                   type="text"
                   fieldType="materialCode"
                   displayName="Mã"
-                  value=""
-                  placeholder=""
                   :required="true"
                   v-model="materialDetail.MaterialCode"
                   tabindex="2"
                   :index="2"
                   @error="arrayError"
+                  :maxLenght="25"
                 />
                 <div
                   class="x-form-error"
@@ -131,16 +123,15 @@
                   id="txtStock"
                   fieldType="stock"
                   displayName="Kho ngầm định"
-                  value=""
                   itemId="StockId"
                   itemName="StockName"
                   itemCode="StockCode"
                   tabindex="4"
                   @btnShowFormAdd="btnShowFormAdd"
-                  :required="false"
                   :selectedId="materialDetail.StockId"
                   v-model="materialDetail.StockId"
                   :data="dataStock"
+                  @changeValueCombo="updateValueCombobox"
                 />
               </BaseLabel>
               <BaseLabel
@@ -157,17 +148,9 @@
                   placeholder=""
                   v-model="materialDetail.MinimumStock"
                   tabindex="6"
-                  :required="false"
+                  
                 /> -->
-                <div
-                  id="txtMinimumStock"
-                  title=""
-                  tabindex="6"
-                  class="field-input"
-                  type="text"
-                  placeholder=""
-                  data-v-0c456455=""
-                >
+                <div class="field-input">
                   <!-- <input
                     data-v-d3863baa=""
                     type="text"
@@ -177,15 +160,14 @@
                   <money
                     ref="inputMinimumStock"
                     id="txtMinimumStock"
-                    type="num"
                     fieldType="minimumStock"
                     displayName="Số lượng tồn tối thiểu"
-                    value=""
-                    placeholder=""
                     v-model="materialDetail.MinimumStock"
                     class="form-input-item"
                     style="text-align: right"
                     v-bind="money"
+                    tabindex="7"
+                    :maxLenght="15"
                   />
                 </div>
               </BaseLabel>
@@ -199,12 +181,11 @@
                     type="textare"
                     fieldType="description"
                     displayName="Mô tả"
-                    value=""
                     v-model="materialDetail.Description"
-                    name=""
                     cols="30"
                     rows="10"
-                    :required="false"
+                    tabindex="8"
+                    :maxLenght="255"
                   ></textarea>
                 </div>
               </BaseLabel>
@@ -268,20 +249,23 @@
       v-if="isShowForm"
       :type="fieldTypeForm"
       ref="formPop"
-      @close="closePopForm"
-      @errorForm="arrayError"
-      :isErrorForm="isError"
+      @closePopForm="closePopForm"
+      @reloadDataUnitAndStock="reloadDataUnitAndStock"
+      @showPopupWarningServer="showPopupWarningServer"
+      @saveChangesPopupShow="saveChangesPopupFormShow"
+      :isConfirm="isConfirmForm"
+      @resetIsConfirm="resetIsConfirm"
     />
     <BasePopup
       v-if="saveChangesPopupShow"
       btn1="Có"
-      btn2="Hủy"
-      btn3="Không"
-      @close="closeSaveChangesPopup"
-      @confirm="confirmSaveChangesPopup"
-      @cancel="cancelSaveChangesPopup"
+      btn2="Không"
+      btn3="Hủy bỏ"
+      @btnClose="closeSaveChangesPopup"
+      @btnConfirm="confirmSaveChangesPopup"
+      @btnCancel="cancelSaveChangesPopup"
       type="confirm-add"
-      icon="icon-info"
+      icon="icon-question"
     >
       {{ saveChangesPopupMessage }}
     </BasePopup>
@@ -289,9 +273,9 @@
     <BasePopup
       v-if="isNotifyInValidPopShow"
       btn1="Đồng ý  "
-      @confirm="onNotifyInValidPopShowConfirm"
+      @btnConfirm="onNotifyInValidPopShowConfirm"
       type="alert"
-      icon="icon-notify"
+      icon="icon-warning"
     >
       {{ notifyInvalidMsg }}
     </BasePopup>
@@ -299,7 +283,7 @@
     <BasePopup
       v-if="isWarningServerPopShow"
       btn1="Đồng ý"
-      @confirm="onWarningServerPopShowConfirm"
+      @btnConfirm="onWarningServerPopShowConfirm"
       type="warning"
       icon="icon-warning"
     >
@@ -341,7 +325,15 @@ export default {
   },
   data() {
     return {
+      // hiển thị form unit, stock
       isShowForm: false,
+
+      // Xác nhận có khi form unit, stock thay đổi
+      isConfirmForm: false,
+
+      // tên của form thay đổi
+      nameFormChange: "",
+
       //hiển popup xác nhận
       saveChangesPopupShow: false,
 
@@ -362,24 +354,9 @@ export default {
 
       countRows: 0,
 
-      materialDetail: {
-        // MaterialCode: "",
-        // MaterialName: "",
-        // MinimumStock: null,
-        // ExprityDate: null,
-        // ExprityType: null,
-        // StopFollowing: null,
-        // MaterialGroupName: "",
-        // PropertiesOfMaterialName: "",
-        // Description: null,
-        // StockId: "",
-        // UnitId: "",
-        // UnitConvertId: "",
-        // ConvertRate: 0,
-        // ConvertRateOperate: "*",
-        // Note: "",
-        // ParentId: "",
-      },
+      materialDetail: {},
+
+      //Bảng đơn vị chuyển đổi
       tableUnitConvert: {
         columns: [
           {
@@ -428,6 +405,7 @@ export default {
         name: "tbUnitConvert",
       },
 
+      //Lưu đơn vị chuyển đổi gốc
       originalConvert: [],
 
       isChecked: [],
@@ -445,15 +423,13 @@ export default {
 
       nameForm: "Thêm Nguyên vật liệu",
 
-      isError: [false, false, false, false, false],
+      isError: [false, false, false],
 
       dataStock: [],
 
       dataUnit: [],
 
-      dataRecord: {
-        MaterialDetails: [],
-      },
+      dataRecord: {},
 
       dataUnitConvert: [
         {
@@ -465,6 +441,7 @@ export default {
         },
       ],
 
+      // Chứa phần tử chưa được đúng định dạng
       invalidRef: [],
     };
   },
@@ -473,6 +450,7 @@ export default {
     this.loadUnit();
     this.loadStock();
     this.load();
+
     if (this.status) {
       const status = this.status;
       if (!status.isHide) {
@@ -480,6 +458,7 @@ export default {
         switch (status.formMode) {
           case FORM_STATE.ADD:
             this.materialDetail.ExprityDate = 0;
+            this.materialDetail.ExprityType = 0;
             break;
           case FORM_STATE.EDIT:
             this.nameForm = "Sửa Nguyên vật liệu";
@@ -493,7 +472,6 @@ export default {
             break;
         }
       }
-      this.originalMaterial = { ...this.dataRecord };
     }
   },
 
@@ -509,8 +487,49 @@ export default {
 
     updateValueCombobox(value, field) {
       this.$set(this.materialDetail, field, value);
+      if (field == "UnitId") {
+        this.tableUnitConvert.data.forEach((item) => {
+          let note = "";
+          note = this.updateNoteConvert(
+            value,
+            item.UnitConvertId,
+            item.ConvertRate,
+            item.ConvertRateOperate
+          );
+          item.Note = note;
+        });
+      }
     },
 
+    updateNoteConvert(unitId, unitConvertId, convertRate, convertRateOperate) {
+      let unitMaterialName = "";
+      let unitConvertName = "";
+      let note = "";
+      if (unitId != undefined && unitId != null && unitConvertId != undefined) {
+        if (unitId == unitConvertId) {
+          this.showPopupInvalidFields(MESSAGE.DUBLICATE_UNIT);
+          this.$refs.tableUnit.focus();
+          return "";
+        } else {
+          unitMaterialName = this.getUnitNameByUnitId(unitId);
+          unitConvertName = this.getUnitNameByUnitId(unitConvertId);
+
+          note =
+            "1 " +
+            unitConvertName +
+            " = " +
+            convertRate +
+            ",00 " +
+            convertRateOperate +
+            " " +
+            unitMaterialName;
+
+          return note;
+        }
+      } else {
+        return "";
+      }
+    },
     /**
      * Cập nhật giá trị đơn vị chuyển đổi thay đổi trong bảng
      * CreateBy: TTUyen(05/10/2021)
@@ -521,32 +540,14 @@ export default {
       console.log(unit);
       const unitConvert = this.tableUnitConvert.data;
       unitConvert[index].UnitConvertId = unit;
-      if (
-        this.materialDetail.UnitId != undefined ||
-        this.materialDetail.UnitId != null
-      ) {
-        if (this.materialDetail.UnitId == unit) {
-          this.showPopupInvalidFields(MESSAGE.DUBLICATE_UNIT);
-        } else {
-          let unitName = this.getUnitNameByUnitId(this.materialDetail.UnitId);
-          if (unit) {
-            let unitConvertName = this.getUnitNameByUnitId(unit);
-            setTimeout(() => {
-              const note =
-                "1 " +
-                unitConvertName +
-                " = " +
-                unitConvert[index].ConvertRate +
-                ",00 * " +
-                unitName;
-              this.$set(unitConvert[index], "Note", note);
-              console.log(note);
-            }, 1500);
-          }
-        }
-        this.$set(this.tableUnitConvert, "data", unitConvert);
-      }
-      // this.$set(this.tableUnitConvert,)
+      const note = this.updateNoteConvert(
+        this.materialDetail.UnitId,
+        unit,
+        unitConvert[index].ConvertRate,
+        unitConvert[index].ConvertRateOperate
+      );
+      this.$set(unitConvert[index], "Note", note);
+      this.$set(this.tableUnitConvert, "data", unitConvert);
     },
 
     /**
@@ -563,7 +564,6 @@ export default {
      */
     onNotifyInValidPopShowConfirm() {
       this.isNotifyInValidPopShow = false;
-      this.invalidRef[0].$el.querySelector("input").focus();
     },
     /**
      * Lấy tên đơn vị theo id đơn vị tính
@@ -586,6 +586,15 @@ export default {
     tableConvertRateOperateChange({ index, rate }) {
       const rateConvert = this.tableUnitConvert.data;
       rateConvert[index].ConvertRateOperate = rate;
+
+      let note = "";
+      note = this.updateNoteConvert(
+        this.materialDetail.UnitId,
+        rateConvert[index].UnitConvertId,
+        rateConvert[index].ConvertRate,
+        rate
+      );
+      rateConvert[index].Note = note;
       this.$set(this.tableUnitConvert, "data", rateConvert);
     },
 
@@ -699,36 +708,27 @@ export default {
 
     handleDetail() {
       this.dataRecord = JSON.parse(JSON.stringify(this.materialDetail));
-      console.log(this.dataRecord);
-      // let materialDetails = [];
-       let detail = {};
-      for (let index = 0; index < this.tableUnitConvert.data.length; index++) {
-        //   let item = Object.assign(
-        //     this.tableUnitConvert.data[index],
-        //     this.dataRecord
-        //   );
-        //   if (item != null) {
-        //     this.$set(materialDetails, index, item);
-        //   }
-        // }
-        // this.dataRecord.MaterialDetails = materialDetails;
+      this.addEntityState(this.originalConvert, this.tableUnitConvert.data);
 
-       
-        detail[index] = this.tableUnitConvert.data[index];
-        // thêm vào mảng dataRecord.ProductDetails
-        if (
-          this.dataRecord.MaterialDetails &&
-          this.dataRecord.MaterialDetails.length
-        ) {
-          this.$set(this.dataRecord, "MaterialDetails", [
-            ...this.dataRecord.MaterialDetails,
-            detail,
-          ]);
+      console.log(this.dataRecord);
+      let materialDetails = [];
+      //  let detail = {};
+      for (let index = 0; index < this.tableUnitConvert.data.length; index++) {
+        let item = {};
+        if (this.status.formMode == FORM_STATE.ADD) {
+          item = Object.assign(
+            this.tableUnitConvert.data[index],
+            this.dataRecord
+          );
         } else {
-          this.$set(this.dataRecord, "MaterialDetails", [detail]);
+          item = Object.assign(item, this.dataRecord);
+          item = Object.assign(item, this.tableUnitConvert.data[index]);
+        }
+        if (item != null) {
+          this.$set(materialDetails, index, item);
         }
       }
-
+      this.dataRecord.MaterialDetails = materialDetails;
       console.log(this.dataRecord);
     },
     /**
@@ -738,12 +738,12 @@ export default {
 
     async sendDetails() {
       this.handleDetail();
-      let material = this.dataRecord;
+      console.log(this.dataRecord);
       try {
         switch (this.status.formMode) {
           case FORM_STATE.ADD:
             await axios
-              .post(CONFIG.MY_URL + "Materials/", material)
+              .post(CONFIG.MY_URL + "Materials/", this.dataRecord)
               .then((res) => {
                 if (res.status != STATUS_CODE.NO_CONTENT) {
                   this.$toast.success(MESSAGE.ADD_MSG_SUCCESS, {
@@ -761,7 +761,7 @@ export default {
             break;
           case FORM_STATE.CLONE:
             await axios
-              .post(CONFIG.MY_URL + "Materials/", material)
+              .post(CONFIG.MY_URL + "Materials/", this.dataRecord)
               .then((res) => {
                 console.log(res.data);
                 if (res.status != STATUS_CODE.NO_CONTENT) {
@@ -777,14 +777,10 @@ export default {
               });
             break;
           case FORM_STATE.EDIT:
-            this.addEntityState(
-              this.originalConvert,
-              this.tableUnitConvert.data
-            );
             await axios
               .put(
                 CONFIG.MY_URL + "Materials/" + this.dataRecord.MaterialId,
-                this.materialDetail
+                this.dataRecord
               )
               .then((res) => {
                 console.log(res.data);
@@ -832,7 +828,59 @@ export default {
 
     onWarningServerPopShowConfirm() {
       this.isWarningServerPopShow = false;
-      this.invalidRef[0].$el.querySelector("input").focus();
+      this.$refs.inputMaterialCode.focus();
+    },
+
+    /**
+     * Hiển thị popup xác nhận đóng
+     */
+    saveChangesPopupFormShow(value) {
+      if (value) {
+        this.nameFormChange = value;
+      }
+      this.saveChangesPopupShow = true;
+      this.saveChangesPopupMessage = MESSAGE.FORM_CHANGED;
+    },
+
+    /**
+     * Đóng popup, đóng form nhập (Không)
+     *  CreateBy: TTUyen(01/09/2021)
+     */
+    closeSaveChangesPopup() {
+      this.saveChangesPopupShow = false;
+      if (this.nameFormChange == "form") {
+        this.isShowForm = false;
+      } else {
+        this.$emit("changeState", true);
+      }
+      this.nameFormChange = "";
+    },
+
+    /**
+     * Đóng popup vẫn hiển thị form nhập (Hủy bỏ)
+     *  CreateBy: TTUyen(01/09/2021)
+     */
+    cancelSaveChangesPopup() {
+      this.saveChangesPopupShow = false;
+    },
+
+    /**
+     * Xác nhận có cất dữ liệu
+     *  CreateBy: TTUyen(01/09/2021)
+     */
+    confirmSaveChangesPopup() {
+      this.saveChangesPopupShow = false;
+      if (this.nameFormChange == "form") {
+        this.isConfirmForm = true;
+        alert(2);
+      } else {
+        this.btnSaveForm();
+      }
+      this.nameFormChange = "";
+    },
+
+    resetIsConfirm() {
+      this.isConfirmForm = false;
     },
     /**
      * Nhận xử lý sinh mã code mới
@@ -962,8 +1010,25 @@ export default {
           .get(`${CONFIG.MY_URL}Materials/Detail/${materialId}`)
           .then((res) => {
             this.dataRecord = res.data.Data;
-            this.tableUnitConvert.data = [...this.dataRecord.MaterialDetails];
-            this.originalConvert = [...this.dataRecord.MaterialDetails];
+            console.log(this.dataRecord);
+
+            let tempConvert = [];
+            // this.originalConvert = [...this.dataRecord.MaterialDetails];
+            for (
+              let index = 0;
+              index < res.data.Data.MaterialDetails.length;
+              index++
+            ) {
+              let item = res.data.Data.MaterialDetails[index];
+              this.$set(tempConvert, index, item);
+            }
+            this.originalConvert = tempConvert;
+
+            // this.originalConvert = [...this.dataRecord.MaterialDetails];
+
+            this.tableUnitConvert.data = [...res.data.Data.MaterialDetails];
+            this.originalMaterial = { ...this.dataRecord };
+            console.log(this.dataRecord);
           })
           .catch((error) => {
             console.log(error);
@@ -987,10 +1052,17 @@ export default {
 
       for (let oldObj of oldArr) {
         if (newArr.indexOf(oldObj) < 0) {
-          oldObj.FlagMode = ENTITY_STATE.DELETE;
+          oldObj.EntityState = ENTITY_STATE.DELETE;
           newArr.push(oldObj);
         }
       }
+    },
+    /**
+     * Tải lại dữ liệu cho unit và stock
+     */
+    async reloadDataUnitAndStock() {
+      await this.loadUnit();
+      await this.loadStock();
     },
     /**
      * Đóng form nhập

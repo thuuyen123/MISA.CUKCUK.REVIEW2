@@ -214,6 +214,9 @@ export default {
       this.updatePage();
     },
 
+    /**
+     * Cập nhật trang
+     */
     updatePage() {
       let me = this;
       if (me.totalRecord < me.pageSize) {

@@ -136,13 +136,13 @@
                   >
                     <BaseCombobox
                       type="cbxform"
-                      ref="inputUnit"
+                      ref="inputUnitConvert"
                       id="txtUnit"
                       fieldType="unitConvert"
                       displayName="Đơn vị tính"
                       itemId="UnitId"
                       itemName="UnitName"
-                      tabindex=""
+                      :tabindex="`${index + 9}`"
                       styleList="max-height: 98px; overflow: auto;"
                       @btnShowFormAdd="btnShowFormAdd('unit')"
                       @inputCombo="unitConvertChange(index, $event)"
@@ -162,37 +162,29 @@
                       :selectedId="record[column.fieldname]"
                       itemId="ConvertRateOperate"
                       itemName="ConvertRateOperateName"
-                      tabindex=""
                       v-model="record['ConvertRateOperate']"
                       @inputCombo="convertRateOperateChange(index, $event)"
+                      :tabindex="`${index + 10}`"
                     />
                   </div>
-                  <!-- 
-                  <BaseInput
-                    v-if="column.fieldname == 'ConvertRate'"
-                    ref="inputConvertRate"
-                    id="txtConvertRate"
-                    type="text"
-                    fieldType="convertRate"
-                    displayName="Tỷ lệ chuyển đổi"
-                    value=""
-                    placeholder=""
-                    tabindex=""
-                  /> -->
+
                   <div v-else-if="column.fieldname == 'ConvertRate'">
+                    <!-- <BaseInput
+                      v-if="column.fieldname == 'ConvertRate'"
+                      ref="inputConvertRate"
+                      id="txtConvertRate"
+                      type="text"
+                      fieldType="convertRate"
+                      displayName="Tỷ lệ chuyển đổi"
+                      value=""
+                      placeholder=""
+                      tabindex=""
+                    /> -->
                     <div
                       title="Tỷ lệ chuyển đổi"
                       tabindex=""
                       class="field-input"
                     >
-                      <!-- <input
-                      ref="inputConvertRate"
-                      type="text"
-                      class="form-input-item"
-                      value="0"
-                      fieldType="convertRate"
-                      id="txtConvertRate"
-                    /> -->
                       <money
                         ref="inputConvertRate"
                         type="text"
@@ -201,6 +193,8 @@
                         style="text-align: right"
                         v-bind="money"
                         v-model="record['ConvertRate']"
+                        @change="changeConvertRate($event.target.value)"
+                        :tabindex="`${index + 10}`"
                       ></money>
                     </div>
                   </div>
@@ -273,8 +267,6 @@ export default {
       name: String,
     },
     isChecked: Array,
-
-    indexOpen: -1,
   },
 
   created() {
@@ -296,21 +288,49 @@ export default {
         precision: 2,
         masked: false,
       },
+
+      indexOpen: -1,
     };
   },
 
   methods: {
+    changeConvertRate() {
+      alert(1);
+    },
+
+    /**
+     * Focus vào đơn vị tính
+     */
+    focus() {
+      if (this.$refs.inputUnitConvert) {
+        this.$refs.inputUnitConvert.focus();
+      }
+    },
+
+    /**
+     * Hàm gửi thay đổi của đơn vị tính sang bên detail
+     */
     unitConvertChange(index, unit) {
       this.$emit("unitChange", { index, unit });
     },
 
+    /**
+     * Hàm gửi thay đổi tỷ lệ chuyển đổi sang detail
+     */
     convertRateOperateChange(index, rate) {
       this.$emit("rateChange", { index, rate });
     },
+
+    /**
+     * Hàm chọn dòng trong bảng
+     */
     onClickChecked(value) {
       this.$emit("changeSelectedTr", value, this.tableData.data[value]);
     },
 
+    /**
+     * Hàm gửi emit DbClick để hiển thị form sửa
+     */
     btnEditOnClick(value) {
       this.$emit(
         "btnEditOnDbClick",
@@ -351,6 +371,9 @@ export default {
       }
     },
 
+    /**
+     * Hiển thị form thêm đơn vị tính or kho ngầm định
+     */
     btnShowFormAdd(value) {
       this.$emit("btnShowFormAdd", value);
     },

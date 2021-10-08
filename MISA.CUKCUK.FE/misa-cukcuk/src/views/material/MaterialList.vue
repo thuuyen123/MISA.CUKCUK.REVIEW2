@@ -271,11 +271,22 @@ export default {
       }
     },
 
+    async loadMaterialDetail(materialId) {
+      try {
+        let res = await axios.get(
+          `${CONFIG.MY_URL}Materials/Detail/${materialId}`
+        );
+        return res;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     /**
      * Hiển thị form dialog
      * CreateBy: TTUyen(02/10/2021)
      */
-    changeStatusForm(isHide, formMode = FORM_STATE.ADD, data = []) {
+    changeStatusForm(isHide, formMode = FORM_STATE.ADD, data = {}) {
       this.recordStatus = {
         isHide: isHide,
         formMode: formMode,
@@ -291,8 +302,6 @@ export default {
       this.idItemSelected = data.MaterialId;
       this.nameMaterial = data.MaterialName;
       this.dataMaterial = data;
-      // console.log(this.idItemSelected);
-      // console.log(this.nameMaterial);
     },
 
     /**

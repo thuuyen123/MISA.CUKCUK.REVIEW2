@@ -267,13 +267,29 @@ namespace MISA.Infrastructor.Repository
                 _dbConnection = new MySqlConnection(_connectionString);
                 _dbConnection.Open();
                 var transaction = _dbConnection.BeginTransaction();
-
+                var dynamicParam = new DynamicParameters();
                 var dynamicParamDetail = new DynamicParameters();
                 var properties = material.GetType().GetProperties();
 
-                var parameters = MappingDbType(material);
+                //var parameters = MappingDbType(material);
+                foreach (var prop in properties)
+                {
+                    // kiểm tra có thuộc tính nào là not map không
+                    var notMapProp = prop.GetCustomAttributes(typeof(MISANotMap), true);
 
-                res = _dbConnection.Execute($"Proc_UpdateMaterial", param: parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
+                    // các thuộc tính là not map sẽ ko dc thêm vào database
+                    if (notMapProp.Length == 0)
+                    {
+                        //Lấy tên thuộc tính
+                        var propName = prop.Name;
+                        //Lấy giá trị thuộc tính
+                        var propValue = prop.GetValue(material);
+
+                        dynamicParam.Add($"${propName}", propValue);
+                    }
+                }
+
+                res = _dbConnection.Execute($"Proc_UpdateMaterial", param: dynamicParam, commandType: CommandType.StoredProcedure, transaction: transaction);
 
                 rowEffects++;
 
@@ -317,7 +333,8 @@ namespace MISA.Infrastructor.Repository
 
                         if (status == 1)
                         {
-                            dynamicParamDetail.Add("MaterialId", Guid.NewGuid());
+                            dynamicParamDetail.Add("$MaterialId", Guid.NewGuid());
+                            dynamicParamDetail.Add("$ParentId", materialId);
                             res = _dbConnection.Execute("Proc_InsertMaterial", param: dynamicParamDetail, transaction: transaction, commandType: CommandType.StoredProcedure);
                             rowEffects++;
                             count++;

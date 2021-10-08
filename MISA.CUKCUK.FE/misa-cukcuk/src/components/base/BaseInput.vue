@@ -1,6 +1,5 @@
 <template>
-  <div class="field-input" :id="id" :title="tooltip" :tabindex="tabindex">
-    <!-- !(isRequiredValid && isValid) && !focusing -->
+  <div class="field-input" :id="id" :title="tooltip">
     <input
       :class="{
         'input-border-red': !(isRequiredValid && isValid) && !focusing,
@@ -11,6 +10,7 @@
       @keyup.enter="inputSearchOnEnter"
       @blur="onBlur($event.target.value)"
       @focus="onInputFocus"
+      :tabindex="tabindex"
       v-bind="$attrs"
       class="form-input-item"
     />
@@ -42,6 +42,7 @@ export default {
       type: [String, Number],
     },
     id: String,
+    
     required: {
       type: Boolean,
       default: false,
@@ -54,18 +55,25 @@ export default {
       default: "",
     },
     index: Number,
+    
     tabindex: String,
+
+    maxLenght: Number,
   },
   created() {
     this.setDefault();
   },
   watch: {},
+
   methods: {
     setDefault() {
       if (this.fieldType == "convertRate") {
         this.value = 0;
       }
     },
+    /**
+     * Hàm focus
+     */
     focus() {
       if (this.$refs.input) {
         this.$refs.input.focus();
@@ -94,7 +102,6 @@ export default {
       let me = this;
       me.$emit("input", value);
       me.validateInput(value);
-      me.sendNewCode(value);
     },
 
     /**

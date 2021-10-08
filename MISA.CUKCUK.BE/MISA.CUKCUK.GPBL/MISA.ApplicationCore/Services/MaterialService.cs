@@ -290,10 +290,10 @@ namespace MISA.ApplicationCore.Services
 
                     if (count != 0)
                     {
+                        var nameValue = material.GetType().GetProperty($"MaterialName").GetValue(material);
 
                         if ( material.EntityState == EntityState.AddNew)
                         {
-                            var nameValue = material.GetType().GetProperty($"MaterialName").GetValue(material);
 
                             devMsg.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString()));
 
@@ -304,6 +304,22 @@ namespace MISA.ApplicationCore.Services
                             _serviceResult.ErrorCode = MISACode.NoValid;
 
                             isValidated = false;
+                        }
+                        else
+                        {
+                           if(count >= 1)
+                            {
+
+                                devMsg.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString()));
+
+                                userMsg.Add(string.Format(Properties.ResourcesVN.ErrorUserMsgDuplicateMaterialCode, propertyValue.ToString(), nameValue));
+
+                                mesError.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString(), nameValue));
+
+                                _serviceResult.ErrorCode = MISACode.NoValid;
+
+                                isValidated = false;
+                            }
                         }
 
                     }

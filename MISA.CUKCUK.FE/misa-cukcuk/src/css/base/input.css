@@ -49,3 +49,12 @@ input[type="checkbox"]:checked::after {
     display: inline-block;
     visibility: visible;
 }
+
+.field-input {
+    outline: 0;
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
