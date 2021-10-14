@@ -1,5 +1,9 @@
 <template>
-  <button class="m-btn" :class="subClass" @click="btnClick">
+  <button
+    class="m-btn"
+    :class="{ 'btn-disable': indexChecked == -1, subClass }"
+    @click="btnClick"
+  >
     <div :class="['m-btn-icon', iconClass]"></div>
     <div class="m-btn-text" v-if="$slots.default"><slot></slot></div>
   </button>
@@ -11,6 +15,7 @@ export default {
   props: {
     subClass: String,
     iconClass: String,
+    indexChecked: Number,
   },
   methods: {
     /**

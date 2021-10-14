@@ -4,6 +4,7 @@ using MISA.ApplicationCore.Interfaces.Services;
 using MISA.ApplicationCore.MISAAttribute;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MISA.ApplicationCore.Services
 {
@@ -219,8 +220,9 @@ namespace MISA.ApplicationCore.Services
                 }
                 else
                 {
+                    var msg = new { userMsg = Properties.ResourcesVN.NoUpdateInDataBase};
                     _serviceResult.Messager = Properties.ResourcesVN.NoUpdateInDataBase;
-                    _serviceResult.Data = rowEffect;
+                    _serviceResult.Data = msg;
                 }
                 return _serviceResult;
             }
@@ -286,14 +288,16 @@ namespace MISA.ApplicationCore.Services
                 if (property.IsDefined(typeof(Duplicated), true))
                 {
 
-                    var count = _materialRepository.CheckMaterialCodeExist(propertyValue.ToString());
+                    var materialByCode = _materialRepository.CheckMaterialCodeExist(material);
 
-                    if (count != 0)
-                    {
-                        var nameValue = material.GetType().GetProperty($"MaterialName").GetValue(material);
+                    if (materialByCode.Count() != 0) {
 
-                        if ( material.EntityState == EntityState.AddNew)
-                        {
+                        //var nameValue = material.GetType().GetProperty($"MaterialName").GetValue(material);
+                        List<Material> m = materialByCode.ToList();
+                        var nameValue = m[0].MaterialName;
+
+                        //if ( material.EntityState == EntityState.AddNew)
+                        //{
 
                             devMsg.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString()));
 
@@ -304,23 +308,23 @@ namespace MISA.ApplicationCore.Services
                             _serviceResult.ErrorCode = MISACode.NoValid;
 
                             isValidated = false;
-                        }
-                        else
-                        {
-                           if(count >= 1)
-                            {
+                        //}
+                        //else
+                        //{
+                        //   if(materialByCode.Count() >  1)
+                        //    {
 
-                                devMsg.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString()));
+                        //        devMsg.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString()));
 
-                                userMsg.Add(string.Format(Properties.ResourcesVN.ErrorUserMsgDuplicateMaterialCode, propertyValue.ToString(), nameValue));
+                        //        userMsg.Add(string.Format(Properties.ResourcesVN.ErrorUserMsgDuplicateMaterialCode, propertyValue.ToString(), nameValue));
 
-                                mesError.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString(), nameValue));
+                        //        mesError.Add(string.Format(Properties.ResourcesVN.ErrorDevMsgDuplicate, propertyValue.ToString(), nameValue));
 
-                                _serviceResult.ErrorCode = MISACode.NoValid;
+                        //        _serviceResult.ErrorCode = MISACode.NoValid;
 
-                                isValidated = false;
-                            }
-                        }
+                        //        isValidated = false;
+                        //    }
+                        //}
 
                     }
 

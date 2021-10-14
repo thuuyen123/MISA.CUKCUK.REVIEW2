@@ -3,16 +3,18 @@
     <input
       :class="{
         'input-border-red': !(isRequiredValid && isValid) && !focusing,
+        'text-align-right': type == 'number',
       }"
       ref="input"
       :value="value"
-      @input="onInput($event.target.value)"
+      @input="[onInput($event.target.value)]"
       @keyup.enter="inputSearchOnEnter"
       @blur="onBlur($event.target.value)"
       @focus="onInputFocus"
       :tabindex="tabindex"
       v-bind="$attrs"
       class="form-input-item"
+      :type="type"
     />
   </div>
 </template>
@@ -42,7 +44,7 @@ export default {
       type: [String, Number],
     },
     id: String,
-    
+
     required: {
       type: Boolean,
       default: false,
@@ -55,22 +57,24 @@ export default {
       default: "",
     },
     index: Number,
-    
+
     tabindex: String,
 
-    maxLenght: Number,
+    maxLength: Number,
+
+    type: String,
   },
   created() {
-    this.setDefault();
+    // this.setDefault();
   },
   watch: {},
 
   methods: {
-    setDefault() {
-      if (this.fieldType == "convertRate") {
-        this.value = 0;
-      }
-    },
+    // setDefault() {
+    //   if (this.fieldType == "convertRate") {
+    //     this.value = 0;
+    //   }
+    // },
     /**
      * Hàm focus
      */
@@ -98,10 +102,10 @@ export default {
      * Hàm nhập input
      * CreateBy: TTUyen (30/8/2021)
      */
-    onInput(value) {
+    onInput(_value) {
       let me = this;
-      me.$emit("input", value);
-      me.validateInput(value);
+      me.$emit("input", _value);
+      me.validateInput(_value);
     },
 
     /**
@@ -112,7 +116,10 @@ export default {
       this.focusing = false;
       let me = this;
       me.validateInput(value);
-      me.sendNewCode(value);
+      if (me.fieldType == "materialName") {
+        me.sendNewCode(value);
+      }
+      this.$emit("changeOnInput", value);
     },
 
     /**
@@ -126,14 +133,23 @@ export default {
       if (me.required) {
         if (value === "" || value === undefined || value === null) {
           valid = false;
+          me.isRequiredValid = false;
+          me.tooltip = MESSAGE.CANT_BE_NULL.format(me.displayName);
+        }
+      }
+      console.log(value);
+      if (me.maxLength) {
+        if ( value != undefined && value.length > me.maxLength) {
+          valid = false;
+          me.isValid = false;
+          me.tooltip = MESSAGE.ISVALID_MAXLENGTH.format(me.maxLength);
         }
       }
       if (valid) {
         me.isRequiredValid = true;
+        me.isValid = true;
         me.$emit("error", false, me.index);
       } else {
-        me.isRequiredValid = false;
-        me.tooltip = MESSAGE.CANT_BE_NULL.format(me.displayName);
         me.$emit("error", true, me.index);
       }
       return valid;
@@ -143,15 +159,14 @@ export default {
      * Gửi yc sinh mã mớ
      */
     sendNewCode(value) {
-      if (this.fieldType == "materialName") {
-        setTimeout(() => {
-          this.$emit("handleNewCode", value);
-        }, 500);
-      }
+      this.$emit("handleNewCode", value);
     },
   },
 };
 </script>
 <style scoped>
 @import "../../css/base/input.css";
+.text-align-right {
+  text-align: right;
+}
 </style>

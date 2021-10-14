@@ -6,10 +6,7 @@
           <div class="title-dialog">{{ nameForm }}</div>
           <div class="tool-form">
             <div class="tool-sprites icon-tool-zoom"></div>
-            <div
-              class="tool-sprites x-tool-close"
-              @click="btnCloseOnClick()"
-            ></div>
+            <div class="tool-sprites x-tool-close" @click="closeOnChange"></div>
           </div>
         </div>
         <div class="dialog-form-content">
@@ -28,7 +25,7 @@
                   :index="0"
                   @error="arrayError"
                   @handleNewCode="handleNewCode"
-                  :maxLenght="128"
+                  :maxLength="128"
                 />
                 <div
                   class="x-form-error"
@@ -55,7 +52,9 @@
                     styleList="max-height: 266px; overflow: auto;"
                     @btnShowFormAdd="btnShowFormAdd"
                     :selectedId="materialDetail.UnitId"
+                    v-model="materialDetail.UnitId"
                     @changeValueCombo="updateValueCombobox"
+                    :isClear="isClear"
                   />
                   <div
                     class="x-form-error"
@@ -75,7 +74,7 @@
                     displayName="Hạn sử dụng"
                     tabindex="5"
                     v-model="materialDetail.ExprityDate"
-                    :maxLenght="15"
+                    :maxLength="15"
                   />
                   <BaseCombobox
                     type="combo"
@@ -106,7 +105,7 @@
                   tabindex="2"
                   :index="2"
                   @error="arrayError"
-                  :maxLenght="25"
+                  :maxLength="25"
                 />
                 <div
                   class="x-form-error"
@@ -132,6 +131,7 @@
                   v-model="materialDetail.StockId"
                   :data="dataStock"
                   @changeValueCombo="updateValueCombobox"
+                  :isClear="isClear"
                 />
               </BaseLabel>
               <BaseLabel
@@ -167,14 +167,14 @@
                     style="text-align: right"
                     v-bind="money"
                     tabindex="7"
-                    :maxLenght="15"
+                    :maxLength="15"
                   />
                 </div>
               </BaseLabel>
             </div>
             <div class="form-block-3">
               <BaseLabel label="Mô tả">
-                <div class="field-textarea" tabindex="7">
+                <div class="field-textarea">
                   <textarea
                     ref="inputDescription"
                     id="txtDescription"
@@ -185,7 +185,7 @@
                     cols="30"
                     rows="10"
                     tabindex="8"
-                    :maxLenght="255"
+                    :maxLength="255"
                   ></textarea>
                 </div>
               </BaseLabel>
@@ -205,17 +205,27 @@
                 @btnShowFormAdd="btnShowFormAdd"
                 @unitChange="tableUnitConvertOnChange($event)"
                 @rateChange="tableConvertRateOperateChange($event)"
+                @changeSelectedTr="changeSelectedTr"
+                @changeConvertRate="changeConvertRate"
+                @changeInput="changeInput('convertRate', $event)"
               />
             </div>
             <div class="form-table-btn">
               <BaseButton
                 type="default"
-                @btn-click="btnAddTrTable"
+                @btn-click="btnAddRowTable"
                 iconClass="sprite icon-btnAddition"
+                title="Ctrl + Insert"
               >
                 Thêm dòng
               </BaseButton>
-              <BaseButton type="default" iconClass="sprite icon-btnDelete">
+              <BaseButton
+                type="default"
+                iconClass="sprite icon-btnDelete"
+                :indexChecked="indexChecked"
+                @btn-click="btnDeleteRowTable"
+                title="Ctrl + Delete"
+              >
                 Xóa dòng
               </BaseButton>
             </div>
@@ -232,13 +242,24 @@
               type="default"
               iconClass="sprite icon-btnSave"
               @btn-click="btnSaveForm"
+              title="Ctrl + S"
             >
               Cất
             </BaseButton>
-            <BaseButton type="default" iconClass="sprite icon-btnSaveAdd">
+            <BaseButton
+              type="default"
+              iconClass="sprite icon-btnSaveAdd"
+              @btn-click="btnSaveAddForm"
+              title="Ctrl + Shift + S"
+            >
               Cất và thêm
             </BaseButton>
-            <BaseButton type="default" iconClass="sprite icon-btnCancel-red">
+            <BaseButton
+              type="default"
+              iconClass="sprite icon-btnCancel-red"
+              @btn-click="btnCloseOnClick"
+              title="Ctrl + B"
+            >
               Hủy bỏ
             </BaseButton>
           </div>
@@ -301,6 +322,7 @@ import BasePopup from "../../components/base/BasePopup.vue";
 import BaseButton from "../../components/base/BaseButton.vue";
 import { MESSAGE } from "../../js/common/const";
 import { FORM_STATE, STATUS_CODE, ENTITY_STATE } from "../../js/common/enums";
+import { CommonFn } from "../../js/common/common-fn";
 import axios from "axios";
 import { CONFIG } from "../../js/common/config";
 import { Money } from "v-money";
@@ -353,6 +375,8 @@ export default {
       warningServerMsg: "",
 
       countRows: 0,
+
+      rowTableSelected: -1,
 
       materialDetail: {},
 
@@ -410,6 +434,8 @@ export default {
 
       isChecked: [],
 
+      indexChecked: -1,
+
       fieldTypeForm: "unit",
 
       originalMaterial: {},
@@ -431,26 +457,27 @@ export default {
 
       dataRecord: {},
 
-      dataUnitConvert: [
-        {
-          Number: 1,
-          UnitConvertId: "",
-          ConvertRate: "",
-          ConvertRateOperate: "",
-          Note: "",
-        },
-      ],
-
       // Chứa phần tử chưa được đúng định dạng
       invalidRef: [],
+
+      isClear: false,
+
+      //sự kiên thao tác bằng tổ hợp phím
+      pressCtrl: false,
+      pressShift: false,
+      pressKeyS: false,
+      pressInsert: false,
+      pressKeyB: false,
+      pressDelete: false,
+
+      focusRefString: "",
     };
   },
-
+  watch: {},
   created() {
     this.loadUnit();
     this.loadStock();
     this.load();
-
     if (this.status) {
       const status = this.status;
       if (!status.isHide) {
@@ -465,7 +492,6 @@ export default {
             this.editForm();
             break;
           case FORM_STATE.CLONE:
-            this.nameForm;
             this.cloneForm();
             break;
           default:
@@ -473,24 +499,69 @@ export default {
         }
       }
     }
-  },
 
-  mounted() {
-    this.focusFirstControl();
+    
   },
 
   methods: {
     /**
-     * Cập nhật giá trị của các NVL chung
+     * Hiển thị xác nhận đóng form khi dữ liệu thay đổi
+     * Đóng form khi dữ liệu không bị thay đổi
+     */
+    closeOnChange() {
+      this.handleDetail();
+      if (this.checkChangeForm(this.originalMaterial, this.dataRecord)) {
+        this.saveChangesPopupFormShow();
+      } else {
+        this.btnCloseOnClick();
+      }
+    },
+
+    /**
+     * Kiểm tra xem form có thay đổi không
+     */
+    checkChangeForm(original, present) {
+      let isChange = false;
+      Object.entries(original).forEach(([key]) => {
+        if (original[key] !== present[key]) {
+          isChange = true;
+        }
+      });
+      return isChange;
+    },
+
+    /**
+     * Cập nhật mô tả trong bản từ việc thay đổi giá trị tỷ lệ chuyển đổi
+     */
+    changeConvertRate({ index, value }) {
+      if (value) {
+        value = CommonFn.formatAutoMoney(value);
+        let unitConvert = this.tableUnitConvert.data;
+        unitConvert[index].ConvertRate = value;
+        // this.$set(this.materialDetail, "ConvertRate", value);
+        let note = "";
+        note = this.updateNoteConvert(
+          index,
+          this.materialDetail.UnitId,
+          unitConvert[index].UnitConvertId,
+          value,
+          unitConvert[index].ConvertRateOperate
+        );
+        this.$set(unitConvert[index], "Note", note);
+        this.$set(this.tableUnitConvert, "data", unitConvert);
+      }
+    },
+    /**
+     * Cập nhật mô tả đơn vị chuyển đổi trong bảng từ cbx đơn vị tính
      * CreateBy: TTUyen(05/10/2021)
      */
-
     updateValueCombobox(value, field) {
       this.$set(this.materialDetail, field, value);
       if (field == "UnitId") {
         this.tableUnitConvert.data.forEach((item) => {
           let note = "";
           note = this.updateNoteConvert(
+            1,
             value,
             item.UnitConvertId,
             item.ConvertRate,
@@ -501,19 +572,27 @@ export default {
       }
     },
 
-    updateNoteConvert(unitId, unitConvertId, convertRate, convertRateOperate) {
+    /**
+     * Hàm cập nhật note theo id đơn vị tính, id đơn vị chuyển đổi, phép tính, tỷ lệ chuyển đổi
+     */
+    updateNoteConvert(
+      index,
+      unitId,
+      unitConvertId,
+      convertRate,
+      convertRateOperate
+    ) {
       let unitMaterialName = "";
       let unitConvertName = "";
       let note = "";
       if (unitId != undefined && unitId != null && unitConvertId != undefined) {
         if (unitId == unitConvertId) {
           this.showPopupInvalidFields(MESSAGE.DUBLICATE_UNIT);
-          this.$refs.tableUnit.focus();
-          return "";
+          this.focusRefString = `inputUnitConvert${index}`;
         } else {
+          this.focusRefString = "";
           unitMaterialName = this.getUnitNameByUnitId(unitId);
           unitConvertName = this.getUnitNameByUnitId(unitConvertId);
-
           note =
             "1 " +
             unitConvertName +
@@ -523,12 +602,9 @@ export default {
             convertRateOperate +
             " " +
             unitMaterialName;
-
-          return note;
         }
-      } else {
-        return "";
       }
+      return note;
     },
     /**
      * Cập nhật giá trị đơn vị chuyển đổi thay đổi trong bảng
@@ -536,11 +612,10 @@ export default {
      */
 
     tableUnitConvertOnChange({ index, unit }) {
-      console.log(index);
-      console.log(unit);
-      const unitConvert = this.tableUnitConvert.data;
+      let unitConvert = this.tableUnitConvert.data;
       unitConvert[index].UnitConvertId = unit;
-      const note = this.updateNoteConvert(
+      let note = this.updateNoteConvert(
+        index,
         this.materialDetail.UnitId,
         unit,
         unitConvert[index].ConvertRate,
@@ -548,6 +623,16 @@ export default {
       );
       this.$set(unitConvert[index], "Note", note);
       this.$set(this.tableUnitConvert, "data", unitConvert);
+    },
+
+    /**
+     * Cập nhật giá trị tỷ lệ chuyển đổi dưới dạng format 1.000.000 khi nhập
+     */
+    changeInput(name, { index, value }) {
+      if (name == "convertRate") {
+        this.tableUnitConvert.data[index].ConvertRate =
+          Number.parseInt(CommonFn.formatAutoMoney(value));
+      }
     },
 
     /**
@@ -564,11 +649,18 @@ export default {
      */
     onNotifyInValidPopShowConfirm() {
       this.isNotifyInValidPopShow = false;
+      if (this.$refs.tableUnit) {
+        if (this.focusRefString != "") {
+          console.log(this.$refs.tableUnit.$refs[this.focusRefString][0]);
+          setTimeout(() => {
+            this.$refs.tableUnit.$refs[this.focusRefString][0].focus();
+          }, 150);
+        }
+      }
     },
     /**
      * Lấy tên đơn vị theo id đơn vị tính
      */
-
     getUnitNameByUnitId(unitId) {
       let unitName;
       this.dataUnit.forEach((item) => {
@@ -589,6 +681,7 @@ export default {
 
       let note = "";
       note = this.updateNoteConvert(
+        index,
         this.materialDetail.UnitId,
         rateConvert[index].UnitConvertId,
         rateConvert[index].ConvertRate,
@@ -599,10 +692,29 @@ export default {
     },
 
     /**
+     * Thay đổi item đã lựa chọn
+     */
+    changeSelectedTr(value, data) {
+      console.log(value);
+      this.isChecked = new Array(this.tableUnitConvert.data.length).fill(false);
+      this.isChecked[value] = true;
+      this.indexChecked = value;
+      console.log(data);
+    },
+
+    /**
+     * Xóa hàng trong bảng
+     */
+    btnDeleteRowTable() {
+      if (this.indexChecked != -1) {
+        this.tableUnitConvert.data.pop(this.indexChecked);
+        this.indexChecked = 0;
+      }
+    },
+    /**
      * Lấy dữ liệu NVL chi tiết
      * CreateBy: TTUyen(05/10/2021)
      */
-
     load() {
       if (this.status.data.MaterialId) {
         this.loadMaterialDetail(this.status.data.MaterialId);
@@ -623,7 +735,6 @@ export default {
      * Nút đóng form
      * CreateBy: TTUyen(05/10/2021)
      */
-
     btnCloseOnClick() {
       this.$emit("close");
     },
@@ -631,10 +742,8 @@ export default {
     /**
      * Hiển thị form sửa
      *  CreateBy: TTUyen(02/10/2021)
-
      */
-
-    editForm() {
+    async editForm() {
       let me = this;
       if (me.status.data) {
         me.materialDetail = me.status.data;
@@ -644,26 +753,32 @@ export default {
     /**
      * Hiển thị form nhân bản
      *  CreateBy: TTUyen(02/10/2021)
-
      */
-
     async cloneForm() {
       let me = this;
       me.materialDetail = JSON.parse(JSON.stringify(me.status.data));
-      let res = await me.getNewCode(me.materialDetail.MaterialName);
-      let newCode = res.data.Data;
-      me.materialDetail.MaterialCode = newCode;
+
+      axios
+        .get(
+          CONFIG.MY_URL +
+            "Materials/NewMaterialCode?materialName=" +
+            CommonFn.removeAccents(me.materialDetail.MaterialName)
+        )
+        .then((res) => {
+          me.materialDetail.MaterialCode = res.data.Data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     /**
      * Lấy mã mới từ API
      *  CreateBy: TTUyen(02/10/2021)
-
      */
-
-    async getNewCode(name) {
+    getNewCode(name) {
       try {
-        let res = await axios.get(
+        let res = axios.get(
           CONFIG.MY_URL + "Materials/NewMaterialCode?materialName=" + name
         );
         return res;
@@ -679,17 +794,18 @@ export default {
      * Thực hiện lưu dữ liệu
      * CreateBy: TTUyen(01/09/2021)
      */
-
-    btnSaveForm() {
+    async save() {
       this.invalidRef = [];
       Object.values(this.$refs).forEach((el) => {
-        if (typeof el.validateInput === "function") {
-          let valid = el.validateInput(el.value);
-          if (el.value == null || el.value == "") {
-            valid = el.validateInput(el.$el.querySelector("input").value);
-          }
-          if (valid === false) {
-            this.invalidRef.push(el);
+        if (el != undefined) {
+          if (typeof el.validateInput === "function") {
+            let valid = el.validateInput(el.value);
+            if (el.value == null || el.value == "") {
+              valid = el.validateInput(el.$el.querySelector("input").value);
+            }
+            if (valid === false) {
+              this.invalidRef.push(el);
+            }
           }
         }
       });
@@ -700,12 +816,16 @@ export default {
         if (typeof this.invalidRef[0].focus === "function") {
           this.invalidRef[0].focus();
         }
-        return false;
+        return Promise.resolve(false);
       } else {
-        return this.sendDetails();
+        let a = await this.sendDetails();
+        return a;
       }
     },
 
+    /**
+     * Hàm xử lý dữ liệu thành object để gửi dữ liệu cho server
+     */
     handleDetail() {
       this.dataRecord = JSON.parse(JSON.stringify(this.materialDetail));
       this.addEntityState(this.originalConvert, this.tableUnitConvert.data);
@@ -724,98 +844,150 @@ export default {
           item = Object.assign(item, this.dataRecord);
           item = Object.assign(item, this.tableUnitConvert.data[index]);
         }
+        item.ConvertRate = Number.parseInt(CommonFn.reFormatMoney(item.ConvertRate));
         if (item != null) {
           this.$set(materialDetails, index, item);
         }
       }
       this.dataRecord.MaterialDetails = materialDetails;
+      this.dataRecord.ConvertRate = CommonFn.reFormatMoney(
+        this.dataRecord.ConvertRate
+      );
+
       console.log(this.dataRecord);
     },
     /**
      * Hàm thực hiện lưu dữ liệu vào database
      * CreateBy: TTUyen(01/09/2021)
      */
-
-    async sendDetails() {
-      this.handleDetail();
-      console.log(this.dataRecord);
-      try {
-        switch (this.status.formMode) {
-          case FORM_STATE.ADD:
-            await axios
-              .post(CONFIG.MY_URL + "Materials/", this.dataRecord)
-              .then((res) => {
-                if (res.status != STATUS_CODE.NO_CONTENT) {
-                  this.$toast.success(MESSAGE.ADD_MSG_SUCCESS, {
-                    position: "bottom-right",
-                    timeout: 2000,
-                  });
-                  this.$emit("changeState", true);
-                }
-              })
-              .catch((error) => {
-                var msgError = String(error.response.data.Data.userMsg);
-                msgError = msgError.split("[").join("");
-                this.showPopupWarningServer(msgError);
-              });
-            break;
-          case FORM_STATE.CLONE:
-            await axios
-              .post(CONFIG.MY_URL + "Materials/", this.dataRecord)
-              .then((res) => {
-                console.log(res.data);
-                if (res.status != STATUS_CODE.NO_CONTENT) {
-                  this.$toast.success(MESSAGE.CLONE_MSG_SUCCESS, {
-                    position: "bottom-right",
-                    timeout: 2000,
-                  });
-                  this.$emit("changeState", true);
-                }
-              })
-              .catch((res) => {
-                this.showPopupWarningServer(res.response.data.Data.userMsg[0]);
-              });
-            break;
-          case FORM_STATE.EDIT:
-            await axios
-              .put(
-                CONFIG.MY_URL + "Materials/" + this.dataRecord.MaterialId,
-                this.dataRecord
-              )
-              .then((res) => {
-                console.log(res.data);
-                if (res.status == STATUS_CODE.SUCCESS) {
-                  this.$toast.success(MESSAGE.EDIT_MSG_SUCCESS, {
-                    position: "bottom-right",
-                    timeout: 2000,
-                  });
-                  this.$emit("changeState", true);
-                }
-              })
-              .catch((error) => {
-                var msgError = String(error.response.data.Data.userMsg);
-                msgError = msgError.split("[").join("");
-                this.showPopupWarningServer(msgError);
-              });
-            break;
-          default:
-            break;
-        }
-      } catch (err) {
-        console.log(err);
-        this.$toast.error(MESSAGE.EXCEPTION_MSG, {
-          position: "bottom-right",
-          timeout: 2000,
+    sendDetails() {
+      return new Promise((resolve) => {
+        this.handleDetail();
+        console.log(this.dataRecord);
+        this.dataRecord.MinimumStock = Number.parseInt(
+          this.dataRecord.MinimumStock
+        );
+        this.dataRecord.ConvertRate = 0;
+        this.dataRecord.MaterialDetails.forEach((item) => {
+          let responseTime = Number(new Date());
+          item.MaterialCode = responseTime + "";
+          item.MinimumStock = Number.parseInt(item.MinimumStock);
         });
-      }
-      this.$emit("reloadData");
+        try {
+          switch (this.status.formMode) {
+            case FORM_STATE.ADD:
+              axios
+                .post(CONFIG.MY_URL + "Materials/", this.dataRecord)
+                .then((res) => {
+                  if (res.status != STATUS_CODE.NO_CONTENT) {
+                    this.$toast.success(MESSAGE.ADD_MSG_SUCCESS, {
+                      position: "bottom-right",
+                      timeout: 2000,
+                    });
+                  }
+                  resolve(true);
+                })
+                .catch((error) => {
+                  var msgError = String(error.response.data.Data.userMsg);
+                  this.showPopupWarningServer(msgError);
+                  resolve(false);
+                });
+              break;
+            case FORM_STATE.CLONE:
+              axios
+                .post(CONFIG.MY_URL + "Materials/", this.dataRecord)
+                .then((res) => {
+                  console.log(res.data);
+                  if (res.status != STATUS_CODE.NO_CONTENT) {
+                    this.$toast.success(MESSAGE.CLONE_MSG_SUCCESS, {
+                      position: "bottom-right",
+                      timeout: 2000,
+                    });
+                  }
+                  resolve(true);
+                })
+                .catch((res) => {
+                  this.showPopupWarningServer(
+                    res.response.data.Data.userMsg[0]
+                  );
+                  resolve(false);
+                });
+              break;
+            case FORM_STATE.EDIT:
+              axios
+                .put(
+                  CONFIG.MY_URL + "Materials/" + this.dataRecord.MaterialId,
+                  this.dataRecord
+                )
+                .then((res) => {
+                  console.log(res.data);
+                  if (res.status == STATUS_CODE.SUCCESS) {
+                    this.$toast.success(MESSAGE.EDIT_MSG_SUCCESS, {
+                      position: "bottom-right",
+                      timeout: 2000,
+                    });
+                  }
+                  resolve(true);
+                })
+                .catch((error) => {
+                  var msgError = String(error.response.data.Data.userMsg);
+                  // msgError = msgError.split("[").join("");
+                  this.showPopupWarningServer(msgError);
+                  resolve(false);
+                });
+              break;
+            default:
+              break;
+          }
+        } catch (err) {
+          console.log(err);
+          this.$toast.error(MESSAGE.EXCEPTION_MSG, {
+            position: "bottom-right",
+            timeout: 2000,
+          });
+        }
+      });
+    },
+    /**
+     * hàm xử lý  cất và hiện thị form thêm mới
+     *  CreateBy: TTUyen(01/09/2021)
+     */
+    btnSaveAddForm() {
+      this.save().then((res) => {
+        if (res) {
+          this.$emit("changeState", false, FORM_STATE.ADD);
+          this.isClear = true;
+          this.tableUnitConvert.data = [];
+          this.materialDetail = {};
+          this.dataRecord = {};
+          this.originalMaterial = {};
+          this.originalConvert = [];
+          this.isChecked = [];
+          this.invalidRef = [];
+          this.materialDetail.ExprityDate = 0;
+          this.materialDetail.ExprityType = 0;
+          this.nameForm = "Thêm Nguyên vật liệu";
+          this.$emit("reloadData");
+        }
+      });
+    },
+
+    /**
+     * Hàm thực hiển lưu NVL
+     */
+    btnSaveForm() {
+      this.save().then((res) => {
+        if (res) {
+          this.$emit("changeState", true);
+          this.$emit("reloadData");
+        }
+      });
     },
 
     /**
      * Hiển thị popup thông báo khi có lỗi từ server
      *  CreateBy: TTUyen(01/09/2021)
      */
-
     showPopupWarningServer(message) {
       this.warningServerMsg = message;
       this.isWarningServerPopShow = true;
@@ -825,7 +997,6 @@ export default {
      * Hiển thị popup thông báo xác nhận
      *  CreateBy: TTUyen(01/09/2021)
      */
-
     onWarningServerPopShowConfirm() {
       this.isWarningServerPopShow = false;
       this.$refs.inputMaterialCode.focus();
@@ -888,27 +1059,26 @@ export default {
      */
 
     async handleNewCode(value) {
-      let me = this;
-      if (value) {
-        value = this.removeAccents(value);
-        let res = await me.getNewCode(value);
-        let newCode = res.data.Data;
-        me.materialDetail.MaterialCode = newCode;
+      if (
+        value &&
+        (this.materialDetail.MaterialCode == null ||
+          this.materialDetail.MaterialCode == "")
+      ) {
+        value = CommonFn.removeAccents(value);
+        axios
+          .get(
+            CONFIG.MY_URL + "Materials/NewMaterialCode?materialName=" + value
+          )
+          .then((res) => {
+            const newCode = res.data.Data;
+            this.$set(this.materialDetail, "MaterialCode", newCode);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     },
 
-    /**
-     * Xóa dấu trong chữ
-     * CreateBy: TTUyen(05/10/2021)
-     */
-
-    removeAccents(str) {
-      return str
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/Đ/g, "D");
-    },
     /**
      * Hiển thị popup form thêm mới
      * CreateBy: TTUyen(05/10/2021)
@@ -924,17 +1094,18 @@ export default {
      * CreateBy: TTUyen(05/10/2021)
      */
 
-    btnAddTrTable() {
+    btnAddRowTable() {
       this.countRows = this.countRows + 1;
       let newRow = {
         Number: this.countRows,
         UnitConvert: "",
-        ConvertRate: "1,00",
+        ConvertRate: "1",
         ConvertRateOperate: "*",
         Note: "",
       };
       this.tableUnitConvert.data.push(newRow);
       this.isChecked = new Array(this.tableUnitConvert.data.length).fill(false);
+      this.indexChecked = this.tableUnitConvert.data.length;
     },
 
     /**
@@ -1013,7 +1184,6 @@ export default {
             console.log(this.dataRecord);
 
             let tempConvert = [];
-            // this.originalConvert = [...this.dataRecord.MaterialDetails];
             for (
               let index = 0;
               index < res.data.Data.MaterialDetails.length;
@@ -1023,10 +1193,14 @@ export default {
               this.$set(tempConvert, index, item);
             }
             this.originalConvert = tempConvert;
-
-            // this.originalConvert = [...this.dataRecord.MaterialDetails];
-
             this.tableUnitConvert.data = [...res.data.Data.MaterialDetails];
+
+            this.isChecked = new Array(this.tableUnitConvert.data.length).fill(
+              false
+            );
+            this.tableUnitConvert.data.forEach((item) => {
+              item.ConvertRate = CommonFn.formatAutoMoney(item.ConvertRate);
+            });
             this.originalMaterial = { ...this.dataRecord };
             console.log(this.dataRecord);
           })
@@ -1070,6 +1244,75 @@ export default {
     closePopForm() {
       this.isShowForm = false;
     },
+  },
+  mounted() {
+    this.focusFirstControl();
+    let me = this;
+    document.addEventListener("keydown", (e) => {
+      switch (e.key) {
+        case "Control":
+          me.pressCtrl = true;
+          break;
+        case "s":
+          me.pressKeyS = true;
+          break;
+        case "b":
+          me.pressKeyB = true;
+          break;
+        case "Shift":
+          me.pressShift = true;
+          break;
+        case "Delete":
+          me.pressDelete = true;
+          break;
+        case "Insert":
+          me.pressInsert = true;
+          break;
+      }
+      if (me.pressCtrl && me.pressKeyS) {
+        me.btnSaveForm();
+        e.preventDefault();
+      }
+      if (me.pressShift && me.pressInsert) {
+        me.btnSaveAddForm();
+        e.preventDefault();
+      }
+      if (me.pressCtrl && me.pressInsert) {
+        me.btnAddRowTable();
+        e.preventDefault();
+      }
+      if (me.pressCtrl && me.pressDelete) {
+        me.btnDeleteRowTable();
+        e.preventDefault();
+      }
+      if (me.pressCtrl && me.pressKeyB) {
+        me.btnCloseOnClick();
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener("keyup", (e) => {
+      switch (e.key) {
+        case "Control":
+          me.pressCtrl = false;
+          break;
+        case "s":
+          me.pressKeyS = false;
+          break;
+        case "b":
+          me.pressKeyB = false;
+          break;
+        case "Shift":
+          me.pressShift = false;
+          break;
+        case "Delete":
+          me.pressDelete = false;
+          break;
+        case "Insert":
+          me.pressInsert = false;
+          break;
+      }
+    });
   },
 };
 </script>

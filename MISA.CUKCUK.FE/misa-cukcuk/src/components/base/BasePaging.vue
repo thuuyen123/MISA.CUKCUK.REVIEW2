@@ -85,6 +85,10 @@ export default {
     totalRecord: Number,
 
     totalPages: Number,
+
+    pageIndex: Number,
+
+    pageSize: Number,
   },
 
   data() {
@@ -93,9 +97,9 @@ export default {
 
       endRecord: 100,
 
-      pageSize: 100,
+      // pageSize: 100,
 
-      pageIndex: 1,
+      // pageIndex: 1,
 
       statusPage: 0,
 
@@ -113,7 +117,14 @@ export default {
       if (value == 0) {
         this.statusPage = 0;
       }
+      this.updatePage();
     },
+    pageIndex(){
+      this.updatePage();
+    },
+    pageSize(){
+      this.updatePage();
+    }
   },
   methods: {
     /**

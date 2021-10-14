@@ -1,6 +1,6 @@
 
 <template>
-  <div class="combobox" v-on-clickaway="away">
+  <div class="combobox" v-on-clickaway="away" >
     <div
       class="combobox-header-wrapper"
       :class="{
@@ -55,10 +55,6 @@
       :class="['combobox-list', opened ? 'isshow' : 'isnone']"
       :style="styleList"
     >
-      <!-- <li v-if="fieldType == 'stock'" class="combo-item combo-item-header">
-        <div class="combo-item-text combo-col-1">Mã</div>
-        <div class="combo-item-text combo-col-2">Tên</div>
-      </li> -->
       <li
         v-for="(item, index) in itemList"
         :key="index"
@@ -69,9 +65,6 @@
         ]"
         @click="clickItem(item[itemId], item[itemName])"
       >
-        <!-- <div v-if="fieldType == 'stock'" class="combobox-item-text combo-col-1">
-          {{ item[itemCode] }}
-        </div> -->
         <div class="combobox-item-text combo-col-2">
           {{ item[itemName] }}
         </div>
@@ -106,10 +99,14 @@ export default {
       default: "",
     },
     fieldType: String,
+
     styleList: String,
+    
     index: Number,
 
     data: Array,
+
+    isClear: Boolean,
   },
   created() {
     this.loadDataCombobox();
@@ -163,7 +160,18 @@ export default {
     selectedId: function () {
       this.initChoice();
     },
+
+    isClear(value) {
+      if (value == true) {
+        this.currentId = -1;
+        this.currentFocus = -1;
+        this.tempName = "";
+        this.currentName = "";
+        this.focusing = false;
+      }
+    },
   },
+
   methods: {
     /**
      * Hàm focus
@@ -187,7 +195,11 @@ export default {
     away: function () {
       this.opened = false;
       this.showCombo = false;
-      this.currentName = this.tempName;
+      // if (this.itemName != "PropertiesOfMaterialName") {
+      if (this.fieldType != "properties") {
+        this.currentName = this.tempName;
+      }
+      // }
     },
 
     /**
@@ -253,13 +265,13 @@ export default {
             me.tempName = me.currentName;
           }
         } else {
-          if (me.fieldType != "pageSize") {
-            me.currentId = me.dataCombobox[0][me.itemId];
-            me.currentName = me.dataCombobox[0][me.itemName];
-            me.tempName = me.currentName;
-          } else {
+          if (me.fieldType == "pageSize") {
             me.currentId = me.dataCombobox[2][me.itemId];
             me.currentName = me.dataCombobox[2][me.itemName];
+            me.tempName = me.currentName;
+          } else {
+            me.currentId = me.dataCombobox[0][me.itemId];
+            me.currentName = me.dataCombobox[0][me.itemName];
             me.tempName = me.currentName;
           }
         }
@@ -267,6 +279,8 @@ export default {
         console.log(error);
       }
     },
+
+    // Lấy dữ liệu cho các combobox
     async loadDataCombobox() {
       let me = this;
       switch (me.fieldType) {
@@ -303,15 +317,15 @@ export default {
             },
           ];
           break;
-        case "stopUsing":
+        case "stopFollowing":
           me.dataCombobox = [
             {
-              StopUsing: 0,
-              StopUsingName: "Không",
+              StopFollowing: "0",
+              StopFollowingName: "Không",
             },
             {
-              StopUsing: 1,
-              StopUsingName: "Có",
+              StopFollowing: "1",
+              StopFollowingName: "Có",
             },
           ];
           break;
@@ -376,6 +390,8 @@ export default {
       this.showCombo = false;
       this.$emit("inputCombo", itemValue);
       this.$emit("changeValueCombo", itemValue, this.itemId);
+      this.$emit("changePropertyName", itemName);
+      this.$emit("changeStopFollowing", itemValue);
       this.$emit("comboboxOnSelect");
       this.isValid = true;
       this.isRequiredValid = true;
@@ -446,6 +462,7 @@ export default {
         this.currentId = -1;
         this.currentFocus = -1;
         this.tempName = "";
+        this.$emit("changePropertyName", this.currentName);
         return;
       }
 
@@ -455,6 +472,7 @@ export default {
         let itemName = this.itemList[index][this.itemName];
         this.clickItem(itemId, itemName);
       }
+
       this.opened = false;
       this.showCombo = false;
     },
@@ -507,6 +525,8 @@ export default {
   right: 0;
   padding: 3px 5px;
   border: 1px solid transparent;
+  display: flex;
+  align-items: center;
 }
 
 .hide-div {

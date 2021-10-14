@@ -38,4 +38,6 @@ export const MESSAGE = {
     RELOAD_SUCCESS: "Tải lại trang thành công",
 
     DUBLICATE_UNIT: "Đơn vị chuyển đổi không được trùng với đơn vị tính chính.",
+
+    ISVALID_MAXLENGTH: "Trường này tối đa {0} ký tự"
 }

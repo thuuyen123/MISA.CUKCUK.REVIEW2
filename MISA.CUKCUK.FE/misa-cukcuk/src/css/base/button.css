@@ -52,12 +52,14 @@
     font-size: 13px;
 }
 
-.m-btn .btn-disable {
+.m-btn.btn-disable {
     border: 1px solid #ccc !important;
     background-color: #fafafa !important;
     opacity: 30% !important;
 }
-
+.m-btn.btn-disable:hover{
+    border:  1px solid transparent !important;
+}
 .m-btn[type="control"] {
     border: 1px solid transparent;
     background-color: transparent;

@@ -37,7 +37,7 @@
 }
 
 .m-panel.main-gridpanel {
-    height: calc(100vh - 55px - 8px - 44px - 34px - 8px - 26px);
+    height: calc(100vh - 55px - 8px - 44px - 34px - 8px - 38px);
     /* overflow: hidden; */
     overflow-x: scroll;
 }

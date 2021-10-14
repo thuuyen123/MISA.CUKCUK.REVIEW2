@@ -14,7 +14,7 @@ namespace MISA.ApplicationCore.Entities
         // kiểu lọc
         public string FilterOption { get; set; }
 
-        // loại lọc: text|cobobox
+        // loại lọc: text|combobox
         public string FilterType { get; set; }
 
         // giá trị lọc

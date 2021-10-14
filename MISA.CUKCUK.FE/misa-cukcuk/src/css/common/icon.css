@@ -209,6 +209,14 @@
     height: 14px;
 }
 
+.x-grid-checked-1 {
+    background-image: url(../../assets/images/checkbox.png);
+    background-repeat: no-repeat;
+    background-position: -15px -15px;
+    width: 14px;
+    height: 14px;
+}
+
 .x-item-disabled .x-grid-checkcolumn{
     opacity: .9;
 }

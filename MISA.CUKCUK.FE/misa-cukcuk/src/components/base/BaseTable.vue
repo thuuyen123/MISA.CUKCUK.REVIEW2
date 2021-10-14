@@ -29,19 +29,20 @@
                         tableData.name == 'tbMaterial'
                       "
                     >
-                      <div class="button-choice-operator">
-                        <button
-                          @click="btnClickToggleMenu(index)"
-                          class="m-btn"
-                        >
-                          *
-                        </button>
-                      </div>
+                      <BaseDropdown
+                        @closeDropdown="closeDropdownMenuFilter(index)"
+                        @updateFilterOption="updateFilterOption(index, $event)"
+                        :ref="'filter' + index"
+                        @btnClickToggleMenu="btnClickToggleMenu(index)"
+                      />
+
                       <div class="x-form-input">
                         <input
                           class="form-input-item"
                           type="text"
                           :id="item.idType"
+                          v-model="filterList[index]['FilterValue']"
+                          @blur="updateFilterValue(index, $event.target.value)"
                         />
                       </div>
                     </div>
@@ -63,43 +64,22 @@
                         itemId="PropertiesOfMaterialId"
                         itemName="PropertiesOfMaterialName"
                         v-if="item.fieldname == 'PropertiesOfMaterialName'"
+                        @changePropertyName="changePropertyName(index, $event)"
                       />
                       <BaseCombobox
                         type="tableList"
-                        ref="inputStopUsing"
-                        id="txtStopUsing"
-                        fieldType="stopUsing"
+                        ref="inputStopFollowing"
+                        id="txtStopFollowing"
+                        fieldType="stopFollowing"
                         displayName="Ngưng sử dụng"
                         value=""
-                        itemId="StopUsing"
-                        itemName="StopUsingName"
-                        v-if="item.fieldname == 'StopUsing'"
+                        itemId="StopFollowing"
+                        itemName="StopFollowingName"
+                        v-if="item.fieldname == 'StopFollowing'"
+                        selectedId="0"
+                        @changeStopFollowing="changeValueCbxStop(index, $event)"
                       />
                     </div>
-                  </div>
-
-                  <div
-                    class="content-menu-filter"
-                    style="display: none"
-                    :ref="'filter' + index"
-                  >
-                    <ul class="context-menu-list">
-                      <li class="context-menu-item active-menu">
-                        <span>* : Chứa</span>
-                      </li>
-                      <li class="context-menu-item">
-                        <span>= : Bằng</span>
-                      </li>
-                      <li class="context-menu-item">
-                        <span>+ : Bắt đầu bằng</span>
-                      </li>
-                      <li class="context-menu-item">
-                        <span>- : Kết thúc bằng</span>
-                      </li>
-                      <li class="context-menu-item">
-                        <span>! : Không chứa</span>
-                      </li>
-                    </ul>
                   </div>
                 </div>
               </th>
@@ -136,7 +116,7 @@
                   >
                     <BaseCombobox
                       type="cbxform"
-                      ref="inputUnitConvert"
+                      :ref="refCbb(index)"
                       id="txtUnit"
                       fieldType="unitConvert"
                       displayName="Đơn vị tính"
@@ -149,6 +129,7 @@
                       :data="dataUnit"
                       :value="record['UnitConvertId']"
                       :selectedId="record['UnitConvertId']"
+                      :required="true"
                     />
                   </div>
                   <div v-else-if="column.fieldname == 'ConvertRateOperate'">
@@ -169,18 +150,19 @@
                   </div>
 
                   <div v-else-if="column.fieldname == 'ConvertRate'">
-                    <!-- <BaseInput
+                    <BaseInput
                       v-if="column.fieldname == 'ConvertRate'"
                       ref="inputConvertRate"
                       id="txtConvertRate"
-                      type="text"
+                      type="number"
                       fieldType="convertRate"
                       displayName="Tỷ lệ chuyển đổi"
-                      value=""
-                      placeholder=""
-                      tabindex=""
-                    /> -->
-                    <div
+                      v-model="record.ConvertRate"
+                      :tabindex="`${index + 10}`"
+                      @changeOnInput="changeConvertRate(index, $event)"
+                      @input="changeInput(index, $event)"
+                    />
+                    <!-- <div
                       title="Tỷ lệ chuyển đổi"
                       tabindex=""
                       class="field-input"
@@ -189,14 +171,12 @@
                         ref="inputConvertRate"
                         type="text"
                         class="form-input-item"
-                        value="0"
                         style="text-align: right"
                         v-bind="money"
-                        v-model="record['ConvertRate']"
-                        @change="changeConvertRate($event.target.value)"
+                        v-model="record.ConvertRate"
                         :tabindex="`${index + 10}`"
                       ></money>
-                    </div>
+                    </div> -->
                   </div>
 
                   <div v-else class="text-value-column">
@@ -206,7 +186,7 @@
                 <div v-else>
                   <div
                     class="text-value-column"
-                    v-if="column.fieldname != 'StopUsing'"
+                    v-if="column.fieldname != 'StopFollowing'"
                   >
                     <span>{{ record[column.fieldname] }}</span>
                   </div>
@@ -214,9 +194,14 @@
                     style="left: 16px; min-width: 16px; text-align: center"
                     v-else
                   >
-                    <!-- <input type="checkbox" class="" /> -->
                     <div title="" class="check-stop x-item-disabled">
-                      <img class="x-grid-checkcolunm" src="" alt="" />
+                      <img
+                        v-if="record.StopFollowing == 0"
+                        class="x-grid-checkcolunm"
+                        src=""
+                        alt=""
+                      />
+                      <img v-else class="x-grid-checked-1" src="" alt="" />
                     </div>
                   </div>
                 </div>
@@ -237,23 +222,22 @@
 </template>
 <script>
 // import { FORM_STATE } from "../../js/common/enums";
-// import { directive as onClickaway } from "vue-clickaway";
 
-// import BaseInput from "./BaseInput.vue";
 import BaseCombobox from "./BaseCombobox.vue";
+import BaseInput from "./BaseInput.vue";
+import BaseDropdown from "./BaseDropdownn.vue";
 import { FORM_STATE } from "../../js/common/enums";
 import axios from "axios";
 import { CONFIG } from "../../js/common/config";
-import { Money } from "v-money";
+import { CommonFn } from "../../js/common/common-fn";
+//  import { Money } from "v-money";
 export default {
-  // directives: {
-  //   onClickaway: onClickaway,
-  // },
   name: "BaseTable",
   components: {
-    // BaseInput,
+    BaseInput,
     BaseCombobox,
-    Money,
+    BaseDropdown,
+    // Money,
   },
 
   props: {
@@ -267,13 +251,27 @@ export default {
       name: String,
     },
     isChecked: Array,
-  },
 
+    filterList: Array,
+
+    isClear: Boolean,
+  },
   created() {
-    this.isChecked[0] = true;
+    if (this.tableData.name == "tableMaterial") {
+      this.isChecked[0] = true;
+    }
     this.loadUnit();
   },
-
+  mounted() {
+    this.focus();
+  },
+  watch: {
+    tableData(value) {
+      if (value.data.ConvertRate) {
+        value.data.ConvertRate = CommonFn.formatMoney(value.ConvertRate);
+      }
+    },
+  },
   data() {
     return {
       top: 0,
@@ -282,22 +280,124 @@ export default {
 
       dataUnit: [],
 
-      money: {
-        decimal: ",",
-        thousands: ".",
-        precision: 2,
-        masked: false,
-      },
-
       indexOpen: -1,
+
+      nameOption: [],
     };
   },
 
   methods: {
-    changeConvertRate() {
-      alert(1);
+    changeInput(index, value) {
+      this.$emit("changeInput", { index: index, value: value });
+    },
+    
+    refCbb(index){
+      return `inputUnitConvert${index}`;
     },
 
+    /**
+     * Hàm gửi emit DbClick để hiển thị form sửa
+     */
+    btnEditOnClick(value) {
+      this.$emit(
+        "btnEditOnDbClick",
+        false,
+        FORM_STATE.EDIT,
+        this.tableData.data[value]
+      );
+    },
+    /**
+     * Xử lý khi click hiển thị tính năng mở rộng
+     * CreateBy: TTUyen (24/09/2021)
+     */
+    btnShowOption(index) {
+      console.log(this.tableData.data[index]);
+      console.log(this.$refs);
+      this.top = this.$refs[`myButton${index}`][0].getBoundingClientRect().top;
+      console.log(this.top);
+      this.$emit("show-option-click", this.tableData.data[index], this.top);
+    },
+
+    /**
+     * Hàm mở menu lọc bằng điều kiện
+     * CreateBy: TTUyen (24/09/2021)
+     */
+    btnClickToggleMenu(index) {
+      this.indexOpen = index;
+      if (!this.openMenu) {
+        // this.$refs[`filter${index}`][0].style.display = "block";
+        this.$refs[`filter${index}`][0].displayBlock();
+        this.openMenu = true;
+      } else {
+        this.openMenu = false;
+        // this.$refs[`filter${index}`][0].style.display = "none";
+        this.$refs[`filter${index}`][0].displayNone();
+      }
+    },
+
+    /**
+     * Hiển thị form thêm đơn vị tính or kho ngầm định
+     */
+    btnShowFormAdd(value) {
+      this.$emit("btnShowFormAdd", value);
+    },
+
+    /**
+     * Lấy dữ liệu cho đơn vị tính
+     */
+    async loadUnit() {
+      try {
+        await axios
+          .get(`${CONFIG.MY_URL}Units`)
+          .then((res) => {
+            this.dataUnit = res.data.Data;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    /**
+     * Thay đổi giá trị của cbx ngừng theo dõi
+     */
+    changeValueCbxStop(index, value) {
+      this.$emit("changeValueFilter", index, value);
+    },
+
+    /**
+     * Thay đổi giá trị của tính chất
+     */
+    changePropertyName(index, name) {
+      this.$emit("changePropertyName", index, name);
+    },
+    /**
+     * Cập nhật giá trị lọc
+     */
+    updateFilterValue(index, value) {
+      this.$emit("updateFilterValue", index, value);
+    },
+
+    /**
+     * Đóng menu dropdown lựa chọn lọc
+     */
+    closeDropdownMenuFilter(index) {
+      this.openMenu = false;
+      this.$refs[`filter${index}`][0].displayNone();
+    },
+
+    /**
+     * Cập nhật lựa chọn lọc
+     */
+    updateFilterOption(index, option) {
+      this.$emit("updateFilterOption", index, option);
+    },
+
+    changeConvertRate(index, value) {
+      this.$emit("changeConvertRate", {index, value});
+    },
     /**
      * Focus vào đơn vị tính
      */
@@ -327,86 +427,6 @@ export default {
     onClickChecked(value) {
       this.$emit("changeSelectedTr", value, this.tableData.data[value]);
     },
-
-    /**
-     * Hàm gửi emit DbClick để hiển thị form sửa
-     */
-    btnEditOnClick(value) {
-      this.$emit(
-        "btnEditOnDbClick",
-        false,
-        FORM_STATE.EDIT,
-        this.tableData.data[value]
-      );
-    },
-    // away: function () {
-    //   alert(1);
-    //   this.openMenu = false;
-    //   this.$refs[`filter${this.indexOpen}`][0].style.display = "none";
-    // },
-    /**
-     * Xử lý khi click hiển thị tính năng mở rộng
-     * CreateBy: TTUyen (24/09/2021)
-     */
-    btnShowOption(index) {
-      console.log(this.tableData.data[index]);
-      console.log(this.$refs);
-      this.top = this.$refs[`myButton${index}`][0].getBoundingClientRect().top;
-      console.log(this.top);
-      this.$emit("show-option-click", this.tableData.data[index], this.top);
-    },
-
-    /**
-     * Hàm mở menu lọc bằng điều kiện
-     * CreateBy: TTUyen (24/09/2021)
-     */
-    btnClickToggleMenu(index) {
-      this.indexOpen = index;
-      if (!this.openMenu) {
-        this.$refs[`filter${index}`][0].style.display = "block";
-        this.openMenu = true;
-      } else {
-        this.openMenu = false;
-        this.$refs[`filter${index}`][0].style.display = "none";
-      }
-    },
-
-    /**
-     * Hiển thị form thêm đơn vị tính or kho ngầm định
-     */
-    btnShowFormAdd(value) {
-      this.$emit("btnShowFormAdd", value);
-    },
-
-    /**
-     * Lấy dữ liệu cho đơn vị tính
-     */
-    async loadUnit() {
-      try {
-        await axios
-          .get(`${CONFIG.MY_URL}Units`)
-          .then((res) => {
-            this.dataUnit = res.data.Data;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * Hàm xử lý khi bấm sửa
-     * CreateBy: TTUyen (24/09/2021)
-     */
-    // btnEditOnClick(index) {
-    //   this.$emit(
-    //     "edit-btn-click",
-    //     false,
-    //     FORM_STATE.EDIT,
-    //     this.tableData.data[index]
-    //   );
-    // },
   },
 };
 </script>

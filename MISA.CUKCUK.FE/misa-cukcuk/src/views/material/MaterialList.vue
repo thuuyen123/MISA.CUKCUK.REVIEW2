@@ -54,11 +54,18 @@
             :isChecked="isChecked"
             @changeSelectedTr="changeSelectedTr"
             @btnEditOnDbClick="changeStatusForm"
+            @updateFilterOption="updateFilterOption"
+            @updateFilterValue="updateFilterValue"
+            @changePropertyName="changePropertyName"
+            @changeValueFilter="changeValueFilter"
+            :filterList="filterList"
           />
         </div>
         <BasePaging
           :totalRecord="totalRecord"
           :totalPages="totalPages"
+          :pageIndex="pageIndex"
+          :pageSize="pageSize"
           @changePageIndex="changePageIndex"
           @changePageSize="changePageSize"
           @btnReloadDataTable="btnReloadDataTable"
@@ -93,6 +100,7 @@ import BasePopup from "../../components/base/BasePopup.vue";
 import BasePaging from "../../components/base/BasePaging.vue";
 import BaseLoading from "../../components/base/BaseLoading.vue";
 import { FORM_STATE, STATUS_CODE } from "../../js/common/enums";
+import { dataFilterList } from "../../js/model/listDatas";
 import { MESSAGE } from "../../js/common/const";
 import { MATERIAL_TEXT } from "../../js/common/enums";
 import MaterialDetail from "./MaterialDetail.vue";
@@ -115,7 +123,7 @@ export default {
         columns: [
           {
             id: "MaterialCodeHead",
-            style: "min-width: 100px; max-width: 150px !important;  ",
+            style: "min-width: 100px; max-width: 100px !important;  ",
             fieldname: "MaterialCode",
             title: "Mã nguyên vật liệu",
             typeFilter: "input",
@@ -123,9 +131,9 @@ export default {
           },
           {
             id: "MaterialNameHead",
-            style: "min-width: 120px; max-width:170px !important; ",
+            style: "min-width: 120px; max-width: 170px !important; ",
             fieldname: "MaterialName",
-            title: "Họ và tên",
+            title: "Tên nguyên vật liệu",
             subClass: "background-color-white",
             typeFilter: "input",
             idType: "txtMaterialName",
@@ -140,7 +148,7 @@ export default {
           },
           {
             id: "UnitHead",
-            style: "min-width: 60px;max-width: 100px !important;",
+            style: "min-width: 60px;max-width: 90px !important;",
             fieldname: "UnitName",
             title: "Đơn vị tính",
             typeFilter: "input",
@@ -155,35 +163,28 @@ export default {
             idType: "txtMaterialGroup",
           },
           {
-            id: "NoteHead",
+            id: "DescriptionHead",
             style: "min-width: 100px; max-width:190px !important;",
-            fieldname: "Note",
+            fieldname: "Description",
             title: "Ghi chú",
-            idType: "txtNote",
+            idType: "txtNDescription",
             typeFilter: "input",
           },
           {
-            id: "StopUsingHead",
-            style: "min-width: 50px; max-width: 140px !important",
-            fieldname: "StopUsing",
+            id: "StopFollowingHead",
+            style: "min-width: 50px; max-width: 90px !important",
+            fieldname: "StopFollowing",
             title: "Ngừng theo dõi",
             typeFilter: "combo",
-            idType: "cbxStopUsing",
+            idType: "cbxStopFollowing",
           },
         ],
         data: [],
         name: "tbMaterial",
       },
 
-      filterList: [
-        {
-          DataField: "MaterialCode",
-          FilterOption: "1",
-          FilterType: "FilterText",
-          FilterValue: "",
-          Enable: false,
-        },
-      ],
+      filterList: [],
+
       recordStatus: {
         isHide: true,
         formMode: FORM_STATE.ADD,
@@ -217,18 +218,78 @@ export default {
   },
 
   created() {
+    this.loadDataFilterList();
     this.loadDataTable();
   },
   methods: {
+    /**
+     * Thay dổi giá trị của combobox lọc ngưng theo dõi
+     */
+    changeValueFilter(index, value) {
+      this.filterList[index].FilterValue = value;
+      this.filterList[index].Enable = true;
+      this.pageIndex = 1;
+      this.loadDataTable();
+    },
+
+    /**
+     * Thay đổi giá trị lọc của cbx tính chất
+     */
+    changePropertyName(index, name) {
+      if (name != "") {
+        this.filterList[index].FilterValue = name;
+        this.filterList[index].Enable = true;
+        this.pageIndex = 1;
+        this.loadDataTable();
+      } else {
+        this.filterList[index].Enable = false;
+        this.loadDataTable();
+      }
+    },
+
+    /**
+     * Đóng form detail
+     */
     detailOnClose() {
       this.recordStatus.isHide = true;
     },
+    /**
+     * Cập nhật giá trị input để lọc
+     */
+    updateFilterValue(index, value) {
+      if (value != "") {
+        this.filterList[index].FilterValue = value;
+        this.filterList[index].Enable = true;
+        this.pageIndex = 1;
+        this.loadDataTable();
+      } else {
+        if (this.filterList[index].Enable == true) {
+          this.filterList[index].FilterValue = value;
+          this.loadDataTable();
+        }
+      }
+    },
 
+    /**
+     * Cập nhật lựa chọn lọc
+     */
+    updateFilterOption(index, option) {
+      this.filterList[index].FilterOption = option;
+      this.filterList[index].Enable = true;
+      this.pageIndex = 1;
+      this.loadDataTable();
+    },
     /**
      * Hàm load dữ liệu phân trang
      */
     async loadDataTable() {
       let me = this;
+      let filterList = [];
+      for (let key of me.filterList) {
+        if (key.FilterValue != "" || key.FilterValue != null)
+          filterList.push(key);
+      }
+      console.log(filterList);
       me.reloading();
       try {
         await axios
@@ -238,7 +299,7 @@ export default {
               me.pageSize +
               "&pageIndex=" +
               me.pageIndex,
-            me.filterList
+            filterList
           )
           .then((res) => {
             if (res.status != STATUS_CODE.NO_CONTENT) {
@@ -271,6 +332,9 @@ export default {
       }
     },
 
+    /**
+     * Lấy dữ liệu NVL chi tiết theo mã NVL
+     */
     async loadMaterialDetail(materialId) {
       try {
         let res = await axios.get(
@@ -282,6 +346,12 @@ export default {
       }
     },
 
+    /**
+     * Lấy dữ liệu lọc
+     */
+    loadDataFilterList() {
+      this.filterList = JSON.parse(JSON.stringify(dataFilterList));
+    },
     /**
      * Hiển thị form dialog
      * CreateBy: TTUyen(02/10/2021)
@@ -407,6 +477,8 @@ export default {
      */
     reloadData() {
       this.pageIndex = 1;
+      this.pageSize = 100;
+      this.filterList = JSON.parse(JSON.stringify(dataFilterList));
       this.loadDataTable();
     },
 

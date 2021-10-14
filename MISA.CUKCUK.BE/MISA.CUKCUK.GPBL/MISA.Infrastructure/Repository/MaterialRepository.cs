@@ -269,6 +269,7 @@ namespace MISA.Infrastructor.Repository
                 var transaction = _dbConnection.BeginTransaction();
                 var dynamicParam = new DynamicParameters();
                 var dynamicParamDetail = new DynamicParameters();
+                var parametersDelete = new DynamicParameters();
                 var properties = material.GetType().GetProperties();
 
                 //var parameters = MappingDbType(material);
@@ -320,6 +321,11 @@ namespace MISA.Infrastructor.Repository
                                 var propValue = propDetail.GetValue(materialDetails[i]);
 
                                 dynamicParamDetail.Add($"${propName}", propValue);
+
+                                if (propName == "MaterialId")
+                                {
+                                    parametersDelete.Add("$MaterialId", propValue);
+                                }
                             }
                             else
                             {
@@ -345,9 +351,9 @@ namespace MISA.Infrastructor.Repository
                             rowEffects++;
                             count++;
                         }
-                        else if(status == 3)
+                        else if (status == 3)
                         {
-                            res = _dbConnection.Execute("Proc_DeleteMaterialUnitConvertById", param: dynamicParamDetail, transaction: transaction, commandType: CommandType.StoredProcedure);
+                            res = _dbConnection.Execute("Proc_DeleteMaterialUnitConvertById", param: parametersDelete, transaction: transaction, commandType: CommandType.StoredProcedure);
                             rowEffects++;
                             count++;
                         }
@@ -434,7 +440,7 @@ namespace MISA.Infrastructor.Repository
             }
         }
 
-        public int CheckMaterialCodeExist(string code)
+        public IEnumerable<Material> CheckMaterialCodeExist(Material material)
         {
 
             try
@@ -445,16 +451,31 @@ namespace MISA.Infrastructor.Repository
 
                 var parameters = new DynamicParameters();
 
-                parameters.Add($"@$MaterialCode", code);
+                var state = -1;
+                
+                if(material.EntityState == EntityState.AddNew)
+                {
+                    state = 0;
+                }
+                else
+                {
+                    state = 1;
+                }
 
-                var res = _dbConnection.QueryFirstOrDefault<int>("Proc_CheckMaterialCodeExist", param: parameters, commandType: CommandType.StoredProcedure);
+                parameters.Add("@$MaterialId", material.MaterialId);
+
+                parameters.Add("@$MaterialCode", material.MaterialCode);
+
+                parameters.Add("@$State", state);
+
+                var res = _dbConnection.Query<Material>("Proc_CheckMaterialCodeExist", param: parameters, commandType: CommandType.StoredProcedure);
 
                 return res;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return 0;
+                return null;
             }
         }
 
@@ -494,7 +515,9 @@ namespace MISA.Infrastructor.Repository
                                         break;
                                     // không chứa
                                     case "5":
-                                        where += $" AND vm.{item.DataField} NOT LIKE CONCAT('%', '{item.FilterValue}' , '%') ";
+                                        if (item.FilterValue != ""){
+                                            where += $" AND vm.{item.DataField} NOT LIKE CONCAT('%', '{item.FilterValue}' , '%') ";
+                                        }
                                         break;
                                     default:
                                         break;
@@ -586,15 +609,15 @@ namespace MISA.Infrastructor.Repository
                 _dbConnection.Open();
 
                 Material material = null;
-                    
+
                 IDataReader reader = null;
-                
+
                 var dynamicParam = new DynamicParameters();
 
                 dynamicParam.Add("$MaterialId", materialId);
-                
+
                 reader = _dbConnection.ExecuteReader("Proc_GetMaterialDetailById", param: dynamicParam, commandType: CommandType.StoredProcedure);
-                
+
                 var dataset = ConvertDataReaderToDataSet(reader);
                 if (dataset?.Tables?.Count > 0)
                 {

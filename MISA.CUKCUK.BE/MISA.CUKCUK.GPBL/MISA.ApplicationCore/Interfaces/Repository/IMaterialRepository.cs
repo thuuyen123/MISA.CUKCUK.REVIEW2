@@ -58,7 +58,7 @@ namespace MISA.ApplicationCore.Interfaces.Repository
         /// <param name="property">Thuộc tính</param>
         /// <returns>Bản ghi tương ứng</returns>
         /// CreateBy TTUyen (03/10/2021)
-        int CheckMaterialCodeExist(string code);
+        IEnumerable<Material> CheckMaterialCodeExist(Material material);
 
         /// <summary>
         /// Sinh mã mới NVL theo tên của nguyên vật liệu

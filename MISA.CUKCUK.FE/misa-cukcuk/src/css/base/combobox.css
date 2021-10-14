@@ -29,10 +29,11 @@
 .combobox-header-wrapper {
     display: flex;
     align-items: center;
-    border-radius: 2px;
+    border-radius: 0px;
     outline: none;
     border: 1px solid #ccc;
     justify-content: space-between;
+    height: 30px;
 }
 
 .combobox-header-wrapper[type="cbxHead"] {
@@ -43,7 +44,7 @@
 }
 
 .combobox-header-wrapper[type="tableList"], .combobox-header-wrapper[type="pageSizeList"], .combobox-header-wrapper[type="form"] {
-    height: 23px;
+    height: 28px;
     background-color: #ffffff!important;
     line-height: 26px!important;
     border: 1px solid #ccc !important;
@@ -56,11 +57,13 @@
     font-family: Tahoma-Regular;
     background-color: 005082;
     background-color: #005082 !important;
+    
 }
 
 .combobox-header-wrapper[type="tableList"] .combobox-value, .combobox-header-wrapper[type="pageSizeList"] .combobox-value, .combobox-header-wrapper[type="form"] .combobox-value {
     color: #000;
     padding: 3px 5px 3px!important;
+    height: 28px;
 }
 
 .combobox-header-wrapper[type="tableList"] .combobox-open, .combobox-header-wrapper[type="pageSizeList"] .combobox-open, .combobox-header-wrapper[type="form"] .combobox-open {
@@ -69,12 +72,12 @@
 }
 
 .combobox-header-wrapper[type="form"] .combobox-value {
-    height: 20px !important;
+    height: 28px !important;
 }
 
 .combobox-header-wrapper[type="pageSizeList"] .combobox-value {
     background-color: #f2f2f2;
-    height: 20px !important;
+    height: 26px !important;
 }
 
 .combobox-header-wrapper[type="tableList"]>input {

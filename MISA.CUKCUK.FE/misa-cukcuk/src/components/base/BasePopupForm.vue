@@ -131,7 +131,7 @@
           >
             Cất
           </BaseButton>
-          <BaseButton type="default" iconClass="sprite icon-btnCancel-red">
+          <BaseButton type="default" iconClass="sprite icon-btnCancel-red" @btn-click="closePopForm">
             Hủy bỏ
           </BaseButton>
         </div>
@@ -188,7 +188,6 @@ export default {
       }
     },
     isConfirm(value){
-      alert(1);
       if(value == true){
         this.btnSaveForm();
         this.$emit("resetIsConfirm");
@@ -402,10 +401,10 @@ export default {
 @import "../../css/base/popup-form.css";
 
 .pop-form-container[type="unit"] {
-  height: 170px;
+  height: 176px;
 }
 
 .pop-form-container[type="stock"] {
-  height: 200px;
+  height: 214px;
 }
 </style>
